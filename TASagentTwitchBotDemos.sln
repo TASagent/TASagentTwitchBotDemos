@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.SimpleDem
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Plugin.ControllerSpy", "TASagentTwitchBotCore\TASagentTwitchBot.Plugin.ControllerSpy\TASagentTwitchBot.Plugin.ControllerSpy.csproj", "{E28B4D8C-15EF-4672-BA39-E0F8BF20BAA5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TASagentTwitchBotCore", "TASagentTwitchBotCore", "{4993C050-2F34-408B-91CB-A7025BC7250B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{230DCBC8-C9DD-43E9-A13C-263924E926C4} = {4993C050-2F34-408B-91CB-A7025BC7250B}
+		{27DF51AE-DF33-4B90-A455-6507E663DB0F} = {4993C050-2F34-408B-91CB-A7025BC7250B}
+		{12D9E6EF-B37E-49D6-AE09-149C86A27465} = {4993C050-2F34-408B-91CB-A7025BC7250B}
+		{A32D7301-F5DE-43AE-980A-96DA07943691} = {4993C050-2F34-408B-91CB-A7025BC7250B}
+		{E28B4D8C-15EF-4672-BA39-E0F8BF20BAA5} = {4993C050-2F34-408B-91CB-A7025BC7250B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F4365226-7A4E-4F79-9340-4B28620BC229}

@@ -77,7 +77,7 @@ namespace TASagentTwitchBot.SimpleDemo.PointsSpender
                     id: pointSpenderData.PointSpenderID,
                     onlyManageableRewards: true);
 
-                if (customRewards.Data.Count == 1 && customRewards.Data[0].Cost == 10_000)
+                if (customRewards.Data is not null && customRewards.Data.Count == 1 && customRewards.Data[0].Cost == 10_000)
                 {
                     //Confirmed
                 }

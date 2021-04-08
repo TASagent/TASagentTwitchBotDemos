@@ -21,7 +21,7 @@ namespace TASagentTwitchBot.SimpleDemo
                 .UseKestrel()
                 .UseUrls("http://0.0.0.0:5000")
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseWebRoot("wwwroot")
+                .UseWebRoot("../TASagentTwitchBotCore/Pages/wwwroot")
                 .UseIISIntegration()
                 .UseStartup<Web.Startup>()
                 .Build();
