@@ -1,0 +1,3 @@
+[submodule "TASagentTwitchBotCore"]
+	path = TASagentTwitchBotCore
+	url = https://github.com/TASagent/TASagentTwitchBotCore.git
