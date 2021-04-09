@@ -1,22 +1,24 @@
 ﻿using System;
-using System.Reflection;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using TASagentTwitchBot.Core.Web;
+using TASagentTwitchBot.Plugin.ControllerSpy.Web;
 
-namespace TASagentTwitchBot.SimpleDemo.Web
+namespace TASagentTwitchBot.SimpleDemo
 {
-    public class Startup : StartupCore
+    public class Startup : Core.StartupCore
     {
         public Startup(IConfiguration configuration)
             : base(configuration)
         {
         }
 
-        //Override 
+        protected override void ConfigureAddCustomAssemblies(IMvcBuilder builder)
+        {
+            builder.AddControllerSpyControllerAssembly();
+        }
+
         protected override void ConfigureDatabases(IServiceCollection services)
         {
             //Register new database
@@ -29,7 +31,7 @@ namespace TASagentTwitchBot.SimpleDemo.Web
         protected override void ConfigureCustomServices(IServiceCollection services)
         {
             services
-                .AddSingleton<TwitchBotDemoApplication>()
+                .AddSingleton<SimpleDemoApplication>()
                 .AddSingleton<Notifications.CustomActivityProvider>();
 
             //Register new PointSpender Redemption container so that it can be invoked by command system
@@ -54,17 +56,12 @@ namespace TASagentTwitchBot.SimpleDemo.Web
                 .AddSingleton<Core.Notifications.ITTSHandler>(x => x.GetRequiredService<Notifications.CustomActivityProvider>());
 
             //Controller Overlay
-            services
-                .AddSingleton<Plugin.ControllerSpy.IControllerManager, Plugin.ControllerSpy.ControllerManager>();
-
-            //Add ControllerSpy Controllers
-            Assembly assembly = typeof(Plugin.ControllerSpy.Web.Controllers.ControllerSpyController).Assembly;
-            services.AddMvc().AddApplicationPart(assembly).AddControllersAsServices();
+            services.RegisterControllerSpyServices();
         }
 
         protected override void BuildCustomEndpointRoutes(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapHub<Plugin.ControllerSpy.Web.Hubs.ControllerSpyHub>("/Hubs/ControllerSpy");
+            endpoints.RegisterControllerSpyEndpoints();
         }
     }
 }

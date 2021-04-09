@@ -4,7 +4,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace TASagentTwitchBot.SimpleDemo
+namespace TASagentTwitchBot.NoOverlaysDemo
 {
     public class Program
     {
@@ -25,7 +25,7 @@ namespace TASagentTwitchBot.SimpleDemo
 
             host.StartAsync().Wait();
 
-            SimpleDemoApplication application = host.Services.GetService(typeof(SimpleDemoApplication)) as SimpleDemoApplication;
+            NoOverlaysDemoApplication application = host.Services.GetService(typeof(NoOverlaysDemoApplication)) as NoOverlaysDemoApplication;
             application.RunAsync().Wait();
 
             host.StopAsync().Wait();

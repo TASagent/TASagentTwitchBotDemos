@@ -4,11 +4,11 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace TASagentTwitchBot.SimpleDemo
+namespace TASagentTwitchBot.BasicMicController
 {
     public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             //Initialize DataManagement
             BGC.IO.DataManagement.Initialize("TASagentBotDemo");
@@ -25,7 +25,7 @@ namespace TASagentTwitchBot.SimpleDemo
 
             host.StartAsync().Wait();
 
-            SimpleDemoApplication application = host.Services.GetService(typeof(SimpleDemoApplication)) as SimpleDemoApplication;
+            BasicMicApplication application = host.Services.GetService(typeof(BasicMicApplication)) as BasicMicApplication;
             application.RunAsync().Wait();
 
             host.StopAsync().Wait();

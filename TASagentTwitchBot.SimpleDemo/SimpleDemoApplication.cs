@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace TASagentTwitchBot.SimpleDemo
 {
-    public class TwitchBotDemoApplication
+    public class SimpleDemoApplication
     {
         private readonly Core.API.Twitch.TokenValidator botTokenValidator;
         private readonly Core.API.Twitch.TokenValidator broadcasterTokenValidator;
@@ -20,7 +20,7 @@ namespace TASagentTwitchBot.SimpleDemo
 
         private readonly Core.ApplicationManagement applicationManagement;
 
-        public TwitchBotDemoApplication(
+        public SimpleDemoApplication(
             Core.Config.IBotConfigContainer botConfigContainer,
             Core.API.Twitch.HelixHelper helixHelper,
             Core.ErrorHandler errorHandler,
