@@ -1,8 +1,6 @@
 using System;
-using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 
 namespace TASagentTwitchBot.NoOverlaysDemo
 {
@@ -17,8 +15,6 @@ namespace TASagentTwitchBot.NoOverlaysDemo
                 .CreateDefaultBuilder(args)
                 .UseKestrel()
                 .UseUrls("http://0.0.0.0:5000")
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseWebRoot("../TASagentTwitchBotCore/Pages/wwwroot")
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();

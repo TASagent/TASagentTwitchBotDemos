@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -23,7 +24,7 @@ namespace TASagentTwitchBot.BasicMicController
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.RegisterControllersWithoutFeatures("TTS", "Overlay", "Notifications");
+            services.RegisterControllersWithoutFeatures("TTS", "Overlay", "Notifications", "Database");
 
 #if DEBUG
             services.AddSwaggerGen(c =>
@@ -78,8 +79,38 @@ namespace TASagentTwitchBot.BasicMicController
 
             app.UseRouting();
             app.UseAuthorization();
+
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDefaultFiles(new DefaultFilesOptions
+                {
+                    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.Combine(Directory.GetParent(env.ContentRootPath).FullName, "TASagentTwitchBotCore", "TASagentTwitchBot.Core", "wwwroot")),
+                    RequestPath = ""
+                });
+
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.Combine(Directory.GetParent(env.ContentRootPath).FullName, "TASagentTwitchBotCore", "TASagentTwitchBot.Core", "wwwroot")),
+                    RequestPath = ""
+                });
+            }
+            else
+            {
+                app.UseDefaultFiles(new DefaultFilesOptions
+                {
+                    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.Combine(env.WebRootPath, "_content", "TASagentTwitchBot.Core")),
+                    RequestPath = ""
+                });
+
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.Combine(env.WebRootPath, "_content", "TASagentTwitchBot.Core")),
+                    RequestPath = ""
+                });
+            }
 
             app.UseMiddleware<Core.Web.Middleware.AuthCheckerMiddleware>();
 

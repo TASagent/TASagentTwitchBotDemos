@@ -2,7 +2,7 @@ using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace TASagentTwitchBot.BasicMicController
+namespace TASagentTwitchBot.FilesTest
 {
     public class Program
     {
@@ -21,7 +21,7 @@ namespace TASagentTwitchBot.BasicMicController
 
             host.StartAsync().Wait();
 
-            BasicMicApplication application = host.Services.GetService(typeof(BasicMicApplication)) as BasicMicApplication;
+            FilesTestApplication application = host.Services.GetService(typeof(FilesTestApplication)) as FilesTestApplication;
             application.RunAsync().Wait();
 
             host.StopAsync().Wait();

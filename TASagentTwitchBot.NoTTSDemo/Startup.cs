@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,6 +54,11 @@ namespace TASagentTwitchBot.NoTTSDemo
         protected override void BuildCustomEndpointRoutes(IEndpointRouteBuilder endpoints)
         {
             endpoints.RegisterControllerSpyEndpoints();
+        }
+
+        protected override void ConfigureCustomStaticFilesSupplement(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            UseCoreLibraryContent(app, env, "TASagentTwitchBot.Plugin.ControllerSpy");
         }
     }
 }
