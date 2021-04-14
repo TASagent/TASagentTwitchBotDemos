@@ -17,18 +17,18 @@ namespace TASagentTwitchBot.BasicMicController
         private readonly Core.Audio.MidiKeyboardHandler midiKeyboardHandler;
 
         public BasicMicApplication(
+            Core.ICommunication communication,
+            Core.IMessageAccumulator messageAccumulator,
             Core.ErrorHandler errorHandler,
             Core.ApplicationManagement applicationManagement,
-            Core.IMessageAccumulator messageAccumulator,
             Core.Audio.IMicrophoneHandler microphoneHandler,
-            Core.ICommunication communication,
             Core.Audio.MidiKeyboardHandler midiKeyboardHandler)
         {
-            this.microphoneHandler = microphoneHandler;
-            this.errorHandler = errorHandler;
-            this.applicationManagement = applicationManagement;
             this.communication = communication;
             this.messageAccumulator = messageAccumulator;
+            this.errorHandler = errorHandler;
+            this.applicationManagement = applicationManagement;
+            this.microphoneHandler = microphoneHandler;
             this.midiKeyboardHandler = midiKeyboardHandler;
 
             BGC.Debug.ExceptionCallback += errorHandler.LogExternalException;

@@ -6,20 +6,20 @@ namespace TASagentTwitchBot.FilesTest
     public class FilesTestApplication
     {
         private readonly Core.ICommunication communication;
+        private readonly Core.IMessageAccumulator messageAccumulator;
         private readonly Core.ErrorHandler errorHandler;
         private readonly Core.ApplicationManagement applicationManagement;
-        private readonly Core.IMessageAccumulator messageAccumulator;
 
         public FilesTestApplication(
-            Core.ErrorHandler errorHandler,
-            Core.ApplicationManagement applicationManagement,
+            Core.ICommunication communication,
             Core.IMessageAccumulator messageAccumulator,
-            Core.ICommunication communication)
+            Core.ErrorHandler errorHandler,
+            Core.ApplicationManagement applicationManagement)
         {
-            this.errorHandler = errorHandler;
-            this.applicationManagement = applicationManagement;
             this.communication = communication;
             this.messageAccumulator = messageAccumulator;
+            this.errorHandler = errorHandler;
+            this.applicationManagement = applicationManagement;
 
             BGC.Debug.ExceptionCallback += errorHandler.LogExternalException;
 

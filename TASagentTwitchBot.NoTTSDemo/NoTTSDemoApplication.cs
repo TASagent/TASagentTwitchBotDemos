@@ -5,43 +5,45 @@ namespace TASagentTwitchBot.NoTTSDemo
 {
     public class NoTTSDemoApplication
     {
-        private readonly Core.API.Twitch.TokenValidator botTokenValidator;
-        private readonly Core.API.Twitch.TokenValidator broadcasterTokenValidator;
-        private readonly Core.Follows.FollowerWebSubClient webSubClient;
-        private readonly Core.PubSub.PubSubClient pubSubClient;
-
         private readonly Core.ICommunication communication;
-        private readonly Core.IRC.IrcClient ircClient;
-        private readonly Core.ErrorHandler errorHandler;
         private readonly Core.IMessageAccumulator messageAccumulator;
+        private readonly Core.ErrorHandler errorHandler;
+        private readonly Core.ApplicationManagement applicationManagement;
+
+        private readonly Core.API.Twitch.IBotTokenValidator botTokenValidator;
+        private readonly Core.API.Twitch.IBroadcasterTokenValidator broadcasterTokenValidator;
+        private readonly Core.WebSub.WebSubHandler webSubHandler;
+        private readonly Core.PubSub.PubSubClient pubSubClient;
+        private readonly Core.IRC.IrcClient ircClient;
 
         private readonly Core.Audio.IMicrophoneHandler microphoneHandler;
         private readonly Core.Audio.MidiKeyboardHandler midiKeyboardHandler;
 
-        private readonly Core.ApplicationManagement applicationManagement;
-
         public NoTTSDemoApplication(
             Core.Config.IBotConfigContainer botConfigContainer,
-            Core.API.Twitch.HelixHelper helixHelper,
-            Core.ErrorHandler errorHandler,
-            Core.IRC.IrcClient ircClient,
-            Core.Follows.FollowerWebSubClient webSubClient,
-            Core.PubSub.PubSubClient pubSubClient,
-            Core.IMessageAccumulator messageAccumulator,
-            Core.Audio.IMicrophoneHandler microphoneHandler,
             Core.ICommunication communication,
-            Core.Audio.MidiKeyboardHandler midiKeyboardHandler,
-            Core.ApplicationManagement applicationManagement)
+            Core.IMessageAccumulator messageAccumulator,
+            Core.ErrorHandler errorHandler,
+            Core.ApplicationManagement applicationManagement,
+            Core.IRC.IrcClient ircClient,
+            Core.API.Twitch.IBotTokenValidator botTokenValidator,
+            Core.API.Twitch.IBroadcasterTokenValidator broadcasterTokenValidator,
+            Core.WebSub.WebSubHandler webSubHandler,
+            Core.PubSub.PubSubClient pubSubClient,
+            Core.Audio.IMicrophoneHandler microphoneHandler,
+            Core.Audio.MidiKeyboardHandler midiKeyboardHandler)
         {
-            this.ircClient = ircClient;
-            this.microphoneHandler = microphoneHandler;
-            this.webSubClient = webSubClient;
-            this.pubSubClient = pubSubClient;
-            this.errorHandler = errorHandler;
             this.communication = communication;
             this.messageAccumulator = messageAccumulator;
-            this.midiKeyboardHandler = midiKeyboardHandler;
+            this.errorHandler = errorHandler;
             this.applicationManagement = applicationManagement;
+            this.ircClient = ircClient;
+            this.botTokenValidator = botTokenValidator;
+            this.broadcasterTokenValidator = broadcasterTokenValidator;
+            this.webSubHandler = webSubHandler;
+            this.pubSubClient = pubSubClient;
+            this.microphoneHandler = microphoneHandler;
+            this.midiKeyboardHandler = midiKeyboardHandler;
 
             BGC.Debug.ExceptionCallback += errorHandler.LogExternalException;
 
@@ -55,9 +57,6 @@ namespace TASagentTwitchBot.NoTTSDemo
             BGC.Debug.LogCallback += communication.SendDebugMessage;
             BGC.Debug.LogWarningCallback += communication.SendWarningMessage;
             BGC.Debug.LogErrorCallback += communication.SendErrorMessage;
-
-            botTokenValidator = new Core.API.Twitch.TokenValidator(botConfigContainer, communication, true, helixHelper);
-            broadcasterTokenValidator = new Core.API.Twitch.TokenValidator(botConfigContainer, communication, false, helixHelper);
         }
 
         public async Task RunAsync()
@@ -97,33 +96,6 @@ namespace TASagentTwitchBot.NoTTSDemo
                 botTokenValidator.RunValidator();
                 broadcasterTokenValidator.RunValidator();
 
-                //Try up to 3 times to connect
-                for (int i = 0; i < 3; i++)
-                {
-                    if (i > 0)
-                    {
-                        await Task.Delay(2000 * i);
-                    }
-
-                    try
-                    {
-                        //Attach sub listener
-                        await webSubClient.Connect();
-
-                        //No exception, break out of loop
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        errorHandler.LogSystemException(ex);
-
-                        if (i == 2)
-                        {
-                            throw new Exception("Unable to start Webhook after 3 attempts");
-                        }
-                    }
-                }
-
                 communication.SendPublicChatMessage("I have connected.");
             }
             catch (Exception ex)
@@ -135,6 +107,8 @@ namespace TASagentTwitchBot.NoTTSDemo
 
             await pubSubClient.Launch();
 
+            await webSubHandler.Subscribe();
+
             try
             {
                 await applicationManagement.WaitForEndAsync();
@@ -143,7 +117,6 @@ namespace TASagentTwitchBot.NoTTSDemo
             {
                 errorHandler.LogSystemException(ex);
             }
-
 
             //Handle Cleanup
             try
@@ -175,7 +148,7 @@ namespace TASagentTwitchBot.NoTTSDemo
 
             try
             {
-                webSubClient.Dispose();
+                webSubHandler.Dispose();
             }
             catch (Exception ex)
             {
