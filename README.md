@@ -4,7 +4,7 @@ Demonstrations of my extensible, modular C# [twitch bot development framework](h
 
 ## How do I use this?
 
-Follow the instructions in the `TASagentTwitchBotCore` project to get started.  More detailed instructions to come.
+Follow the instructions in the [TASagentTwitchBotCore](https://github.com/TASagent/TASagentTwitchBotCore) project to get started.  More detailed instructions to come.
 
 ### Notifications
 

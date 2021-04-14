@@ -24,6 +24,15 @@ namespace TASagentTwitchBot.NoTTSDemo
         protected override string[] GetExcludedFeatures() =>
             new string[] { "TTS" };
 
+        protected override void ConfigureDatabases(IServiceCollection services)
+        {
+            //Register new database
+            services.AddSingleton<Database.DatabaseContext>();
+
+            //Register new database to be served for required BaseDatabaseContext
+            services.AddSingleton<Core.Database.BaseDatabaseContext>(x => x.GetRequiredService<Database.DatabaseContext>());
+        }
+
         protected override void ConfigureCustomServices(IServiceCollection services)
         {
             //De-register the TTS command
