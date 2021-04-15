@@ -11,7 +11,7 @@ namespace TASagentTwitchBot.FilesTest
             //Initialize DataManagement
             BGC.IO.DataManagement.Initialize("TASagentBotDemo");
 
-            IWebHost host = WebHost
+            using IWebHost host = WebHost
                 .CreateDefaultBuilder(args)
                 .UseKestrel()
                 .UseUrls("http://0.0.0.0:5000")
@@ -25,8 +25,6 @@ namespace TASagentTwitchBot.FilesTest
             application.RunAsync().Wait();
 
             host.StopAsync().Wait();
-
-            host.Dispose();
         }
     }
 }

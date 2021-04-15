@@ -58,9 +58,6 @@ namespace TASagentTwitchBot.NoTTSDemo
 
             //Controller Overlay
             services.RegisterControllerSpyServices();
-
-            //Swapping out view for basic
-            services.AddSingleton<Core.View.IConsoleOutput, Core.View.BasicView>();
         }
 
         protected override void BuildCustomEndpointRoutes(IEndpointRouteBuilder endpoints)

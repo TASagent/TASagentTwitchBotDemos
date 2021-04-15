@@ -20,7 +20,6 @@ namespace TASagentTwitchBot.SimpleDemo
         private readonly Core.Audio.MidiKeyboardHandler midiKeyboardHandler;
 
         public SimpleDemoApplication(
-            Core.Config.IBotConfigContainer botConfigContainer,
             Core.ICommunication communication,
             Core.IMessageAccumulator messageAccumulator,
             Core.ErrorHandler errorHandler,
@@ -44,19 +43,6 @@ namespace TASagentTwitchBot.SimpleDemo
             this.pubSubClient = pubSubClient;
             this.microphoneHandler = microphoneHandler;
             this.midiKeyboardHandler = midiKeyboardHandler;
-
-            BGC.Debug.ExceptionCallback += errorHandler.LogExternalException;
-
-            if (string.IsNullOrEmpty(botConfigContainer.BotConfig.TwitchClientId) ||
-                string.IsNullOrEmpty(botConfigContainer.BotConfig.BroadcasterId))
-            {
-                throw new Exception($"Bot not Configured.");
-            }
-
-            //Assign library log handlers
-            BGC.Debug.LogCallback += communication.SendDebugMessage;
-            BGC.Debug.LogWarningCallback += communication.SendWarningMessage;
-            BGC.Debug.LogErrorCallback += communication.SendErrorMessage;
         }
 
         public async Task RunAsync()
@@ -64,27 +50,6 @@ namespace TASagentTwitchBot.SimpleDemo
             try
             {
                 communication.SendDebugMessage("*** Starting Up ***");
-                communication.SendDebugMessage("Connecting to Twitch");
-
-                if (!await botTokenValidator.TryToConnect())
-                {
-                    communication.SendErrorMessage("------------> URGENT <------------");
-                    communication.SendErrorMessage("Please check bot credential process and try again.");
-                    communication.SendErrorMessage("Unable to connect to Twitch");
-                    communication.SendErrorMessage("Exiting bot application now...");
-                    await Task.Delay(7500);
-                    Environment.Exit(1);
-                }
-
-                if (!await broadcasterTokenValidator.TryToConnect())
-                {
-                    communication.SendErrorMessage("------------> URGENT <------------");
-                    communication.SendErrorMessage("Please check broadcaster credential process and try again.");
-                    communication.SendErrorMessage("Unable to connect to Twitch");
-                    communication.SendErrorMessage("Exiting bot application now...");
-                    await Task.Delay(7500);
-                    Environment.Exit(1);
-                }
 
                 microphoneHandler.Start();
 
@@ -92,7 +57,7 @@ namespace TASagentTwitchBot.SimpleDemo
 
                 await ircClient.Start();
 
-                //Kick off Validator
+                //Kick off Validators
                 botTokenValidator.RunValidator();
                 broadcasterTokenValidator.RunValidator();
 
@@ -106,7 +71,6 @@ namespace TASagentTwitchBot.SimpleDemo
             messageAccumulator.MonitorMessages();
 
             await pubSubClient.Launch();
-
             await webSubHandler.Subscribe();
 
             try
@@ -117,7 +81,6 @@ namespace TASagentTwitchBot.SimpleDemo
             {
                 errorHandler.LogSystemException(ex);
             }
-
 
             //Handle Cleanup
             try

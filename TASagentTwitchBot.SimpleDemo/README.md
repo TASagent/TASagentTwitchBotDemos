@@ -38,6 +38,6 @@ Registers the chat commands to interact with the `PointsSpender`.  Adds a `!poin
 
 Adds REST endpoints for triggering some new functionality.  `TestNotification()` is invoked by POST calls to `/TASagentBotAPI/Test/TestNotification`, and `TestUptime()` is invoked by POST calls to `/TASagentBotAPI/Test/TestUptime`.
 
-## Web.Startup
+## Startup
 
 Registers all of the new classes so they can be constructed.

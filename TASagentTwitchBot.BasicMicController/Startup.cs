@@ -35,11 +35,15 @@ namespace TASagentTwitchBot.BasicMicController
 
             services.AddSignalR();
 
+
             services
                 .AddSingleton<BasicMicApplication>()
                 .AddSingleton<Core.ErrorHandler>()
                 .AddSingleton<Core.ApplicationManagement>()
                 .AddSingleton<Core.Audio.MidiKeyboardHandler>();
+
+            services
+                .AddSingleton<Core.IConfigurator, AudioConfigurator>();
 
             services
                 .AddSingleton<Core.ICommunication, Core.CommunicationHandler>()

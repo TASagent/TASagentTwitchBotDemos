@@ -30,13 +30,6 @@ namespace TASagentTwitchBot.BasicMicController
             this.applicationManagement = applicationManagement;
             this.microphoneHandler = microphoneHandler;
             this.midiKeyboardHandler = midiKeyboardHandler;
-
-            BGC.Debug.ExceptionCallback += errorHandler.LogExternalException;
-
-            //Assign library log handlers
-            BGC.Debug.LogCallback += communication.SendDebugMessage;
-            BGC.Debug.LogWarningCallback += communication.SendWarningMessage;
-            BGC.Debug.LogErrorCallback += communication.SendErrorMessage;
         }
 
         public async Task RunAsync()
