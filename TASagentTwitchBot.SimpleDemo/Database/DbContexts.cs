@@ -14,7 +14,7 @@ namespace TASagentTwitchBot.SimpleDemo.Database
 
         public async Task<SupplementalData> GetSupplementalDataAsync(Core.Database.User user)
         {
-            SupplementalData userSupplementalData = SupplementalData.FirstOrDefault(x => x.UserId == user.UserId);
+            SupplementalData userSupplementalData = await SupplementalData.FirstOrDefaultAsync(x => x.UserId == user.UserId);
 
             if (userSupplementalData is null)
             {
@@ -23,28 +23,8 @@ namespace TASagentTwitchBot.SimpleDemo.Database
                     User = user
                 };
 
-                SupplementalData.Add(userSupplementalData);
-
+                await SupplementalData .AddAsync(userSupplementalData);
                 await SaveChangesAsync();
-            }
-
-            return userSupplementalData;
-        }
-
-        public SupplementalData GetSupplementalData(Core.Database.User user)
-        {
-            SupplementalData userSupplementalData = SupplementalData.FirstOrDefault(x => x.UserId == user.UserId);
-
-            if (userSupplementalData is null)
-            {
-                userSupplementalData = new SupplementalData()
-                {
-                    User = user
-                };
-
-                SupplementalData.Add(userSupplementalData);
-
-                SaveChanges();
             }
 
             return userSupplementalData;

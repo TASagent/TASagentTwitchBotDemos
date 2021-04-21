@@ -27,10 +27,10 @@ namespace TASagentTwitchBot.NoTTSDemo
         protected override void ConfigureDatabases(IServiceCollection services)
         {
             //Register new database
-            services.AddSingleton<Database.DatabaseContext>();
+            services.AddDbContext<Database.DatabaseContext>();
 
             //Register new database to be served for required BaseDatabaseContext
-            services.AddSingleton<Core.Database.BaseDatabaseContext>(x => x.GetRequiredService<Database.DatabaseContext>());
+            services.AddScoped<Core.Database.BaseDatabaseContext>(x => x.GetRequiredService<Database.DatabaseContext>());
         }
 
         protected override void ConfigureCustomServices(IServiceCollection services)

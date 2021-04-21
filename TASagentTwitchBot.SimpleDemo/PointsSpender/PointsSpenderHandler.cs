@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 using TASagentTwitchBot.Core.Database;
 using TASagentTwitchBot.Core.API.Twitch;
@@ -23,9 +24,10 @@ namespace TASagentTwitchBot.SimpleDemo.PointsSpender
 
     public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, IDisposable
     {
-        private readonly Database.DatabaseContext db;
         private readonly HelixHelper helixHelper;
         private readonly Core.ICommunication communication;
+
+        private readonly IServiceScopeFactory scopeFactory;
 
         private readonly SemaphoreSlim initSemaphore = new SemaphoreSlim(1);
 
@@ -38,11 +40,11 @@ namespace TASagentTwitchBot.SimpleDemo.PointsSpender
         public PointSpenderHandler(
             Core.ICommunication communication,
             HelixHelper helixHelper,
-            Database.DatabaseContext db)
+            IServiceScopeFactory scopeFactory)
         {
             this.communication = communication;
             this.helixHelper = helixHelper;
-            this.db = db;
+            this.scopeFactory = scopeFactory;
 
             dataFilePath = BGC.IO.DataManagement.PathForDataFile("Config", "PointSpender.json");
 
@@ -135,40 +137,48 @@ namespace TASagentTwitchBot.SimpleDemo.PointsSpender
                 rewardId: pointSpenderData.PointSpenderID,
                 status: "UNFULFILLED");
 
-            bool updated = false;
 
-            foreach (var redemption in pendingRedemptions.Data)
+            if (pendingRedemptions.Data is not null && pendingRedemptions.Data.Count > 0)
             {
-                User user = db.Users.First(x => x.TwitchUserId == redemption.UserID);
+                bool updated = false;
 
-                if (user is null)
+                using IServiceScope scope = scopeFactory.CreateScope();
+                Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
+
+                foreach (var redemption in pendingRedemptions.Data)
                 {
-                    communication.SendErrorMessage($"User not found: {redemption.UserID}");
-                    continue;
+                    User user = db.Users.First(x => x.TwitchUserId == redemption.UserID);
+
+                    if (user is null)
+                    {
+                        communication.SendErrorMessage($"User not found: {redemption.UserID}");
+                        continue;
+                    }
+
+                    Database.SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
+
+                    updated = true;
+
+                    supplementalData.PointsSpent += 10;
+                    supplementalData.LastPointsSpentUpdate = redemption.RedeemedAt;
+
+                    await helixHelper.UpdateCustomRewardRedemptions(
+                        redemption.RewardData.Id,
+                        redemption.Id,
+                        status: "FULFILLED");
                 }
 
-                Database.SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
+                if (updated)
+                {
+                    await db.SaveChangesAsync();
 
-                updated = true;
+                    long totalPointsSpent = 1000 * db.SupplementalData.Select(x => (long)x.PointsSpent).Sum();
 
-                supplementalData.PointsSpent += 10;
-                supplementalData.LastPointsSpentUpdate = redemption.RedeemedAt;
-
-                await helixHelper.UpdateCustomRewardRedemptions(
-                    redemption.RewardData.Id,
-                    redemption.Id,
-                    status: "FULFILLED");
+                    communication.SendPublicChatMessage(
+                        $"An updated total of {totalPointsSpent:N0} spent channel points.");
+                }
             }
 
-            if (updated)
-            {
-                await db.SaveChangesAsync();
-
-                long totalPointsSpent = 1000 * db.SupplementalData.Select(x => (long)x.PointsSpent).Sum();
-
-                communication.SendPublicChatMessage(
-                    $"An updated total of {totalPointsSpent:N0} spent channel points.");
-            }
         }
 
         private void Serialize()
@@ -205,6 +215,9 @@ namespace TASagentTwitchBot.SimpleDemo.PointsSpender
             //Handle redemption
             communication.SendDebugMessage($"Redemption: {user.TwitchUserName}");
 
+            using IServiceScope scope = scopeFactory.CreateScope();
+            Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
+
             Database.SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
 
             supplementalData.PointsSpent += 10;
@@ -231,6 +244,9 @@ namespace TASagentTwitchBot.SimpleDemo.PointsSpender
             }
 
             const int messageLimit = 500;
+
+            using IServiceScope scope = scopeFactory.CreateScope();
+            Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
 
             long totalPointsSpent = 1000 * db.SupplementalData.Select(x => (long)x.PointsSpent).Sum();
 
@@ -276,6 +292,9 @@ namespace TASagentTwitchBot.SimpleDemo.PointsSpender
                 await InitializeAsync();
             }
 
+            using IServiceScope scope = scopeFactory.CreateScope();
+            Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
+
             Database.SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
 
             if (supplementalData.PointsSpent > 0)
@@ -299,7 +318,10 @@ namespace TASagentTwitchBot.SimpleDemo.PointsSpender
 
             otherUserName = otherUserName.ToLower();
 
-            User otherUser = db.Users.FirstOrDefault(x => x.TwitchUserName.ToLower() == otherUserName);
+            using IServiceScope scope = scopeFactory.CreateScope();
+            Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
+
+            User otherUser = await db.Users.FirstOrDefaultAsync(x => x.TwitchUserName.ToLower() == otherUserName);
 
             if (otherUser == null)
             {
