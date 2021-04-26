@@ -23,7 +23,7 @@ namespace TASagentTwitchBot.SimpleDemo.Database
                     User = user
                 };
 
-                await SupplementalData .AddAsync(userSupplementalData);
+                SupplementalData.Add(userSupplementalData);
                 await SaveChangesAsync();
             }
 
