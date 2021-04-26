@@ -20,7 +20,7 @@ namespace TASagentTwitchBot.SimpleDemo.Database
             {
                 userSupplementalData = new SupplementalData()
                 {
-                    User = user
+                    UserId = user.UserId
                 };
 
                 SupplementalData.Add(userSupplementalData);
