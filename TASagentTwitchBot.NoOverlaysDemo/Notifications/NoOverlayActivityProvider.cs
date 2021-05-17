@@ -143,7 +143,7 @@ namespace TASagentTwitchBot.NoOverlaysDemo.Notifications
                 ttsRequest = await ttsRenderer.TTSRequest(
                     voicePreference: subscriber.TTSVoicePreference,
                     pitchPreference: subscriber.TTSPitchPreference,
-                    effectsChain: audioEffectSystem.Parse(subscriber.TTSEffectsChain),
+                    effectsChain: audioEffectSystem.SafeParse(subscriber.TTSEffectsChain),
                     ttsText: message);
             }
 
@@ -248,7 +248,7 @@ namespace TASagentTwitchBot.NoOverlaysDemo.Notifications
                 ttsRequest = await ttsRenderer.TTSRequest(
                     voicePreference: cheerer.TTSVoicePreference,
                     pitchPreference: cheerer.TTSPitchPreference,
-                    effectsChain: audioEffectSystem.Parse(cheerer.TTSEffectsChain),
+                    effectsChain: audioEffectSystem.SafeParse(cheerer.TTSEffectsChain),
                     ttsText: message);
             }
 
@@ -540,7 +540,7 @@ namespace TASagentTwitchBot.NoOverlaysDemo.Notifications
             return ttsRenderer.TTSRequest(
                 voicePreference: user.TTSVoicePreference,
                 pitchPreference: user.TTSPitchPreference,
-                effectsChain: audioEffectSystem.Parse(user.TTSEffectsChain),
+                effectsChain: audioEffectSystem.SafeParse(user.TTSEffectsChain),
                 ttsText: message);
         }
 
