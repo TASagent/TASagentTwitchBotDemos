@@ -21,6 +21,7 @@
     <ProjectReference Include="..\TASagentTwitchBotCore\BGC_Tools\BGC_Tools.csproj" />
     <ProjectReference Include="..\TASagentTwitchBotCore\TASagentTwitchBot.Core\TASagentTwitchBot.Core.csproj" />
     <ProjectReference Include="..\TASagentTwitchBotCore\TASagentTwitchBot.Plugin.ControllerSpy\TASagentTwitchBot.Plugin.ControllerSpy.csproj" />
+    <ProjectReference Include="..\TASagentTwitchBotCore\TASagentTwitchBot.Plugin.TTTAS\TASagentTwitchBot.Plugin.TTTAS.csproj" />
   </ItemGroup>
 
   <ItemGroup>

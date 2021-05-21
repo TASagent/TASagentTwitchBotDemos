@@ -61,7 +61,6 @@ namespace TASagentTwitchBot.NoOverlaysDemo
         protected override void ConstructCoreSingletons(IServiceProvider serviceProvider)
         {
             //Make sure required services are constructed
-            serviceProvider.GetRequiredService<Core.Config.IBotConfigContainer>().Initialize();
             serviceProvider.GetRequiredService<Core.View.IConsoleOutput>();
             serviceProvider.GetRequiredService<Core.Chat.ChatLogger>();
             serviceProvider.GetRequiredService<Core.Commands.CommandSystem>();

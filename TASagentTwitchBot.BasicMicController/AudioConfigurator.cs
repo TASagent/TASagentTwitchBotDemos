@@ -8,10 +8,10 @@ namespace TASagentTwitchBot.BasicMicController
     public class AudioConfigurator : Core.BaseConfigurator
     {
         public AudioConfigurator(
-            Core.Config.IBotConfigContainer botConfigContainer,
+            Core.Config.BotConfiguration botConfig,
             Core.ICommunication communication,
             Core.ErrorHandler errorHandler)
-            : base(botConfigContainer, communication, errorHandler)
+            : base(botConfig, communication, errorHandler)
         {
         }
 

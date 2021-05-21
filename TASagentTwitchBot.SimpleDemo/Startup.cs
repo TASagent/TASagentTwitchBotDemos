@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using TASagentTwitchBot.Plugin.ControllerSpy.Web;
+using TASagentTwitchBot.Plugin.TTTAS.Web;
 
 namespace TASagentTwitchBot.SimpleDemo
 {
@@ -19,7 +20,9 @@ namespace TASagentTwitchBot.SimpleDemo
 
         protected override void ConfigureAddCustomAssemblies(IMvcBuilder builder)
         {
+            //Plugins
             builder.AddControllerSpyControllerAssembly();
+            builder.AddTTTASAssembly();
         }
 
         protected override void ConfigureDatabases(IServiceCollection services)
@@ -58,18 +61,23 @@ namespace TASagentTwitchBot.SimpleDemo
                 .AddSingleton<Core.Notifications.IFollowerHandler>(x => x.GetRequiredService<Notifications.CustomActivityProvider>())
                 .AddSingleton<Core.Notifications.ITTSHandler>(x => x.GetRequiredService<Notifications.CustomActivityProvider>());
 
-            //Controller Overlay
+            //Plugins
             services.RegisterControllerSpyServices();
+            services.RegisterTTTASServices();
         }
 
         protected override void BuildCustomEndpointRoutes(IEndpointRouteBuilder endpoints)
         {
+            //Plugins
             endpoints.RegisterControllerSpyEndpoints();
+            endpoints.RegisterTTTASEndpoints();
         }
 
         protected override void ConfigureCustomStaticFilesSupplement(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //Plugins
             UseCoreLibraryContent(app, env, "TASagentTwitchBot.Plugin.ControllerSpy");
+            UseCoreLibraryContent(app, env, "TASagentTwitchBot.Plugin.TTTAS");
         }
     }
 }

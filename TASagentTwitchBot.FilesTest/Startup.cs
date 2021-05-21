@@ -36,6 +36,9 @@ namespace TASagentTwitchBot.FilesTest
             services.AddSignalR();
 
             services
+                .AddSingleton<Core.Config.BotConfiguration>(Core.Config.BotConfiguration.GetConfig());
+
+            services
                 .AddSingleton<FilesTestApplication>()
                 .AddSingleton<Core.ErrorHandler>()
                 .AddSingleton<Core.ApplicationManagement>();
@@ -43,7 +46,6 @@ namespace TASagentTwitchBot.FilesTest
             services
                 .AddSingleton<Core.ICommunication, Core.CommunicationHandler>()
                 .AddSingleton<Core.IMessageAccumulator, Core.MessageAccumulator>()
-                .AddSingleton<Core.Config.IBotConfigContainer, Core.Config.BotConfigContainer>()
                 .AddSingleton<Core.View.IConsoleOutput, Core.View.BasicView>();
         }
 
@@ -93,7 +95,6 @@ namespace TASagentTwitchBot.FilesTest
                 endpoints.MapHub<Core.Web.Hubs.MonitorHub>("/Hubs/Monitor");
             });
 
-            app.ApplicationServices.GetRequiredService<Core.Config.IBotConfigContainer>().Initialize();
             app.ApplicationServices.GetRequiredService<Core.View.IConsoleOutput>();
         }
 

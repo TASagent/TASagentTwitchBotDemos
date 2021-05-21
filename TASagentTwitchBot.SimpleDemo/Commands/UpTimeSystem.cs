@@ -13,11 +13,11 @@ namespace TASagentTwitchBot.SimpleDemo.Commands
         private readonly Core.API.Twitch.HelixHelper helixHelper;
 
         public UpTimeSystem(
-            Core.Config.IBotConfigContainer botConfigContainer,
+            Core.Config.BotConfiguration botConfig,
             Core.ICommunication communication,
             Core.API.Twitch.HelixHelper helixHelper)
         {
-            botConfig = botConfigContainer.BotConfig;
+            this.botConfig = botConfig;
             this.communication = communication;
             this.helixHelper = helixHelper;
         }

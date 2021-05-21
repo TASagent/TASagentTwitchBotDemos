@@ -35,6 +35,8 @@ namespace TASagentTwitchBot.BasicMicController
 
             services.AddSignalR();
 
+            services
+                .AddSingleton<Core.Config.BotConfiguration>(Core.Config.BotConfiguration.GetConfig());
 
             services
                 .AddSingleton<BasicMicApplication>()
@@ -48,7 +50,6 @@ namespace TASagentTwitchBot.BasicMicController
             services
                 .AddSingleton<Core.ICommunication, Core.CommunicationHandler>()
                 .AddSingleton<Core.IMessageAccumulator, Core.MessageAccumulator>()
-                .AddSingleton<Core.Config.IBotConfigContainer, Core.Config.BotConfigContainer>()
                 .AddSingleton<Core.Audio.IAudioPlayer, Core.Audio.AudioPlayer>()
                 .AddSingleton<Core.Audio.IMicrophoneHandler, Core.Audio.MicrophoneHandler>()
                 .AddSingleton<Core.Audio.ISoundEffectSystem, Core.Audio.SoundEffectSystem>()
@@ -124,7 +125,6 @@ namespace TASagentTwitchBot.BasicMicController
                 endpoints.MapHub<Core.Web.Hubs.MonitorHub>("/Hubs/Monitor");
             });
 
-            app.ApplicationServices.GetRequiredService<Core.Config.IBotConfigContainer>().Initialize();
             app.ApplicationServices.GetRequiredService<Core.View.IConsoleOutput>();
         }
     }
