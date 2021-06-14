@@ -6,7 +6,7 @@
     <Version>1.2.0</Version>
     <Authors>TASagent</Authors>
     <Product>TTTASDemo</Product>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>TASPvtKey.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
