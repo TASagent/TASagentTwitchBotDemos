@@ -56,7 +56,8 @@ namespace TASagentTwitchBot.TTTASDemo
                 botTokenValidator.RunValidator();
                 broadcasterTokenValidator.RunValidator();
 
-                communication.SendPublicChatMessage("I have connected.");
+                //Uncomment for a comforting connection notification
+                //communication.SendPublicChatMessage("I have connected.");
             }
             catch (Exception ex)
             {
