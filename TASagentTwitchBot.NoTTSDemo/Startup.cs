@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,6 +32,13 @@ namespace TASagentTwitchBot.NoTTSDemo
 
             //Register new database to be served for required BaseDatabaseContext
             services.AddScoped<Core.Database.BaseDatabaseContext>(x => x.GetRequiredService<Database.DatabaseContext>());
+        }
+
+        protected override void SetupDatabase(IApplicationBuilder app)
+        {
+            using IServiceScope serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
+            Database.DatabaseContext context = serviceScope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
+            context.Database.Migrate();
         }
 
         protected override void ConfigureCustomServices(IServiceCollection services)
