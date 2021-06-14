@@ -3,6 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
+    <Version>1.2.0</Version>
+    <Authors>TASagent</Authors>
+    <Product>TTTASDemo</Product>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>TASPvtKey.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
