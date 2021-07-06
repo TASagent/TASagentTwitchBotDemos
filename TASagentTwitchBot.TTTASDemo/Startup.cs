@@ -130,6 +130,7 @@ namespace TASagentTwitchBot.TTTASDemo
             //Plugins
             UseCoreLibraryContent(app, env, "TASagentTwitchBot.Plugin.TTTAS");
         }
+
         protected override void ConfigureCoreMiddleware(IApplicationBuilder app)
         {
             app.UseMiddleware<Core.Web.Middleware.AuthCheckerMiddleware>();

@@ -15,12 +15,12 @@ namespace TASagentTwitchBot.TTTASDemo
             Core.API.Twitch.IBotTokenValidator botTokenValidator,
             Core.API.Twitch.IBroadcasterTokenValidator broadcasterTokenValidator)
             : base(
-                  botConfig,
-                  communication,
-                  errorHandler,
-                  helixHelper,
-                  botTokenValidator,
-                  broadcasterTokenValidator)
+                botConfig,
+                communication,
+                errorHandler,
+                helixHelper,
+                botTokenValidator,
+                broadcasterTokenValidator)
         {
 
         }
