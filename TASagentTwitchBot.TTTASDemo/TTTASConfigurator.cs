@@ -92,7 +92,11 @@ namespace TASagentTwitchBot.TTTASDemo
 
                 if (string.IsNullOrEmpty(botConfig.VoiceOutputDevice))
                 {
-                    botConfig.EnableErrorHandling = false;
+                    botConfig.CommandConfiguration.EnableErrorHandling = false;
+                    botConfig.CommandConfiguration.HelpEnabled = false;
+                    botConfig.CommandConfiguration.SetEnabled = false;
+                    botConfig.CommandConfiguration.GetEnabled = false;
+
                     botConfig.MicConfiguration.Enabled = false;
                     botConfig.VoiceOutputDevice = devices[0];
                     botConfig.Serialize();
