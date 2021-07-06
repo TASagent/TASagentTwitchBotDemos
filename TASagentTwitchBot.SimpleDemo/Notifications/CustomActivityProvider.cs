@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using TASagentTwitchBot.Core.Notifications;
 
+using TASagentTwitchBot.Core.Notifications;
 
 namespace TASagentTwitchBot.SimpleDemo.Notifications
 {

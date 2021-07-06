@@ -9,7 +9,6 @@ namespace TASagentTwitchBot.TTTASDemo.View
 {
     public class TTTASBasicView : Core.View.IConsoleOutput, IDisposable
     {
-        private readonly Core.Config.BotConfiguration botConfig;
         private readonly ICommunication communication;
         private readonly Core.Notifications.IActivityDispatcher activityDispatcher;
         private readonly Plugin.TTTAS.ITTTASProvider tttasProvider;
@@ -23,13 +22,11 @@ namespace TASagentTwitchBot.TTTASDemo.View
         private bool disposedValue = false;
 
         public TTTASBasicView(
-            Core.Config.BotConfiguration botConfig,
             ICommunication communication,
             Plugin.TTTAS.ITTTASProvider tttasProvider,
             Core.Notifications.IActivityDispatcher activityDispatcher,
             ApplicationManagement applicationManagement)
         {
-            this.botConfig = botConfig;
             this.communication = communication;
             this.tttasProvider = tttasProvider;
             this.activityDispatcher = activityDispatcher;
@@ -41,9 +38,6 @@ namespace TASagentTwitchBot.TTTASDemo.View
 
             communication.ReceivePendingNotificationHandlers += ReceivePendingNotification;
             communication.ReceiveEventHandlers += ReceiveEventHandler;
-            //communication.ReceiveMessageLoggers += ReceiveMessageHandler;
-            //communication.SendMessageHandlers += SendPublicChatHandler;
-            //communication.SendWhisperHandlers += SendWhisperHandler;
             communication.DebugMessageHandlers += DebugMessageHandler;
 
             communication.SendDebugMessage("TTTASBasicView Connected.  Listening for Ctrl+Q to quit gracefully.\n");
@@ -87,21 +81,6 @@ namespace TASagentTwitchBot.TTTASDemo.View
                 default:
                     throw new NotSupportedException($"Unexpected messageType: {messageType}");
             }
-        }
-
-        private void SendPublicChatHandler(string message)
-        {
-            Console.WriteLine($"Chat    {botConfig.BotName}: {message}");
-        }
-
-        private void SendWhisperHandler(string username, string message)
-        {
-            Console.WriteLine($"Chat    {botConfig.BotName} whispers {username}: {message}");
-        }
-
-        private void ReceiveMessageHandler(Core.IRC.TwitchChatter chatter)
-        {
-            Console.WriteLine($"Chat    {chatter.User.TwitchUserName}: {chatter.Message}");
         }
 
         public void LaunchListeners()
@@ -209,9 +188,6 @@ namespace TASagentTwitchBot.TTTASDemo.View
                 if (disposing)
                 {
                     communication.ReceiveEventHandlers -= ReceiveEventHandler;
-                    //communication.ReceiveMessageLoggers -= ReceiveMessageHandler;
-                    //communication.SendMessageHandlers -= SendPublicChatHandler;
-                    //communication.SendWhisperHandlers -= SendWhisperHandler;
                     communication.DebugMessageHandlers -= DebugMessageHandler;
 
                     generalTokenSource.Cancel();

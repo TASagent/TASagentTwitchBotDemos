@@ -1,16 +1,11 @@
 using System;
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 
-using TASagentTwitchBot.Core.Web;
 using TASagentTwitchBot.Plugin.TTTAS.Web;
 
 namespace TASagentTwitchBot.TTTASDemo
