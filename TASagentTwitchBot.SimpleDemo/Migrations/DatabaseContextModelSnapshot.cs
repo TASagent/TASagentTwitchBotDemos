@@ -14,7 +14,7 @@ namespace TASagentTwitchBot.SimpleDemo.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.4");
+                .HasAnnotation("ProductVersion", "5.0.7");
 
             modelBuilder.Entity("TASagentTwitchBot.Core.Database.CustomTextCommand", b =>
                 {
@@ -92,6 +92,9 @@ namespace TASagentTwitchBot.SimpleDemo.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("TTSPitchPreference")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TTSSpeedPreference")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("TTSVoicePreference")
