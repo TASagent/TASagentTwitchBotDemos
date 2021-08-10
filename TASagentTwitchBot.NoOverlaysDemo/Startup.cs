@@ -43,7 +43,8 @@ namespace TASagentTwitchBot.NoOverlaysDemo
                 .UnregisterImplementation<Core.Notifications.NotificationServer>()
                 .UnregisterImplementation<Core.Notifications.FullActivityProvider>()
                 .UnregisterImplementation<Core.Timer.TimerManager>()
-                .UnregisterImplementation<Core.EmoteEffects.EmoteEffectListener>();
+                .UnregisterImplementation<Core.EmoteEffects.EmoteEffectListener>()
+                .UnregisterImplementation<Core.EmoteEffects.EmoteEffectSystem>();
 
             //Register core application
             services.AddSingleton<NoOverlaysDemoApplication>();
