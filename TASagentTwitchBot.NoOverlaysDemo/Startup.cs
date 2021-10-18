@@ -73,6 +73,7 @@ namespace TASagentTwitchBot.NoOverlaysDemo
             serviceProvider.GetRequiredService<Core.View.IConsoleOutput>();
             serviceProvider.GetRequiredService<Core.Chat.ChatLogger>();
             serviceProvider.GetRequiredService<Core.Commands.CommandSystem>();
+            serviceProvider.GetRequiredService<Core.EventSub.EventSubHandler>();
         }
     }
 }

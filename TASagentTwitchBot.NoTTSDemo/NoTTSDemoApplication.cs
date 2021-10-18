@@ -12,7 +12,6 @@ namespace TASagentTwitchBot.NoTTSDemo
 
         private readonly Core.API.Twitch.IBotTokenValidator botTokenValidator;
         private readonly Core.API.Twitch.IBroadcasterTokenValidator broadcasterTokenValidator;
-        private readonly Core.WebSub.WebSubHandler webSubHandler;
         private readonly Core.PubSub.PubSubClient pubSubClient;
         private readonly Core.IRC.IrcClient ircClient;
 
@@ -27,7 +26,6 @@ namespace TASagentTwitchBot.NoTTSDemo
             Core.IRC.IrcClient ircClient,
             Core.API.Twitch.IBotTokenValidator botTokenValidator,
             Core.API.Twitch.IBroadcasterTokenValidator broadcasterTokenValidator,
-            Core.WebSub.WebSubHandler webSubHandler,
             Core.PubSub.PubSubClient pubSubClient,
             Core.Audio.IMicrophoneHandler microphoneHandler,
             Core.Audio.MidiKeyboardHandler midiKeyboardHandler)
@@ -39,7 +37,6 @@ namespace TASagentTwitchBot.NoTTSDemo
             this.ircClient = ircClient;
             this.botTokenValidator = botTokenValidator;
             this.broadcasterTokenValidator = broadcasterTokenValidator;
-            this.webSubHandler = webSubHandler;
             this.pubSubClient = pubSubClient;
             this.microphoneHandler = microphoneHandler;
             this.midiKeyboardHandler = midiKeyboardHandler;
@@ -71,7 +68,6 @@ namespace TASagentTwitchBot.NoTTSDemo
             messageAccumulator.MonitorMessages();
 
             await pubSubClient.Launch();
-            await webSubHandler.Subscribe();
 
             try
             {
@@ -104,15 +100,6 @@ namespace TASagentTwitchBot.NoTTSDemo
             try
             {
                 ircClient.Dispose();
-            }
-            catch (Exception ex)
-            {
-                errorHandler.LogSystemException(ex);
-            }
-
-            try
-            {
-                webSubHandler.Dispose();
             }
             catch (Exception ex)
             {

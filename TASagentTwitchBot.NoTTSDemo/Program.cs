@@ -15,7 +15,7 @@ namespace TASagentTwitchBot.NoTTSDemo
             using IWebHost host = WebHost
                 .CreateDefaultBuilder(args)
                 .UseKestrel()
-                .UseUrls("http://0.0.0.0:5000", $"http://0.0.0.0:{Core.Web.Middleware.WebSubHandlerMiddleware.WEBSUB_PORT}")
+                .UseUrls("http://0.0.0.0:5000")
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();

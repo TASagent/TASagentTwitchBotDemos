@@ -74,14 +74,10 @@ namespace TASagentTwitchBot.TTTASDemo
                 .AddSingleton<Core.IRC.IIRCLogger, IRC.IRCNonLogger>()
                 .AddSingleton<Core.PubSub.IRedemptionSystem, Core.PubSub.RedemptionSystem>()
                 .AddSingleton<Core.Database.IUserHelper, Core.Database.UserHelper>();
-
-            //Returns the address that websubs should be directed at
-            //Replace this with a custom class if you're behind a proxy or have a domain
-            services.AddSingleton<Core.Config.IExternalWebAccessConfiguration, Core.Config.ExternalWebAccessConfiguration>();
         }
 
-        //Don't need WebSub system
-        protected override void ConfigureCoreWebSubServices(IServiceCollection services) { }
+        //Don't need EventSub system
+        protected override void ConfigureCoreEventSubServices(IServiceCollection services) { }
 
         protected override void ConfigureCoreCommandServices(IServiceCollection services)
         {
