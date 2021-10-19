@@ -1,6 +1,6 @@
-# TASagent Twitch Bot Demos
+# TASagent Stream Bot Demos
 
-Demonstrations of my extensible, modular C# [twitch bot development framework](https://github.com/TASagent/TASagentTwitchBotCore).
+Demonstrations of my extensible, modular C# [stream bot development framework](https://github.com/TASagent/TASagentTwitchBotCore).
 
 ## How do I use this?
 
