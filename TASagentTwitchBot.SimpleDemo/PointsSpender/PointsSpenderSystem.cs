@@ -1,73 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using TASagentTwitchBot.Core.Commands;
 
-using TASagentTwitchBot.Core.Commands;
+namespace TASagentTwitchBot.SimpleDemo.PointsSpender;
 
-namespace TASagentTwitchBot.SimpleDemo.PointsSpender
+public class PointsSpenderSystem : ICommandContainer
 {
-    public class PointsSpenderSystem : ICommandContainer
+    private readonly Core.ICommunication communication;
+    private readonly IPointSpenderHandler pointsSpenderHandler;
+
+    private DateTime lastLeaderboardRequest = DateTime.MinValue;
+    private readonly TimeSpan leaderboardCooldown = new TimeSpan(0, 1, 0);
+
+    public PointsSpenderSystem(
+        Core.ICommunication communication,
+        IPointSpenderHandler pointsSpenderHandler)
     {
-        private readonly Core.ICommunication communication;
-        private readonly IPointSpenderHandler pointsSpenderHandler;
+        this.communication = communication;
+        this.pointsSpenderHandler = pointsSpenderHandler;
+    }
 
-        private DateTime lastLeaderboardRequest = DateTime.MinValue;
-        private readonly TimeSpan leaderboardCooldown = new TimeSpan(0, 1, 0);
+    public void RegisterCommands(
+        Dictionary<string, CommandHandler> commands,
+        Dictionary<string, HelpFunction> helpFunctions,
+        Dictionary<string, SetFunction> setFunctions,
+        Dictionary<string, GetFunction> getFunctions)
+    {
+        commands.Add("points", PointsHandler);
+        commands.Add("leaderboard", LeaderboardHandler);
+    }
 
-        public PointsSpenderSystem(
-            Core.ICommunication communication,
-            IPointSpenderHandler pointsSpenderHandler)
+    public IEnumerable<string> GetPublicCommands()
+    {
+        yield return "points";
+        yield return "leaderboard";
+    }
+
+    private async Task PointsHandler(Core.IRC.TwitchChatter chatter, string[] remainingCommand)
+    {
+        if (remainingCommand.Length > 1)
         {
-            this.communication = communication;
-            this.pointsSpenderHandler = pointsSpenderHandler;
+            communication.SendPublicChatMessage($"@{chatter.User.TwitchUserName}, incorrectly formatted points request.");
         }
-
-        public void RegisterCommands(
-            Dictionary<string, CommandHandler> commands,
-            Dictionary<string, HelpFunction> helpFunctions,
-            Dictionary<string, SetFunction> setFunctions,
-            Dictionary<string, GetFunction> getFunctions)
+        else if (remainingCommand.Length == 0)
         {
-            commands.Add("points", PointsHandler);
-            commands.Add("leaderboard", LeaderboardHandler);
+            await pointsSpenderHandler.PrintSelfPoints(chatter.User);
         }
-
-        public IEnumerable<string> GetPublicCommands()
+        else
         {
-            yield return "points";
-            yield return "leaderboard";
+            string otherUserName = remainingCommand[0];
+
+            if (otherUserName[0] == '@')
+            {
+                otherUserName = otherUserName[1..];
+            }
+
+            await pointsSpenderHandler.PrintOtherPoints(chatter.User, otherUserName);
         }
+    }
 
-        private async Task PointsHandler(Core.IRC.TwitchChatter chatter, string[] remainingCommand)
+    private async Task LeaderboardHandler(Core.IRC.TwitchChatter chatter, string[] remainingCommand)
+    {
+        if (DateTime.Now - lastLeaderboardRequest > leaderboardCooldown)
         {
-            if (remainingCommand.Length > 1)
-            {
-                communication.SendPublicChatMessage($"@{chatter.User.TwitchUserName}, incorrectly formatted points request.");
-            }
-            else if (remainingCommand.Length == 0)
-            {
-                await pointsSpenderHandler.PrintSelfPoints(chatter.User);
-            }
-            else
-            {
-                string otherUserName = remainingCommand[0];
-
-                if (otherUserName[0] == '@')
-                {
-                    otherUserName = otherUserName[1..];
-                }
-
-                await pointsSpenderHandler.PrintOtherPoints(chatter.User, otherUserName);
-            }
-        }
-
-        private async Task LeaderboardHandler(Core.IRC.TwitchChatter chatter, string[] remainingCommand)
-        {
-            if (DateTime.Now - lastLeaderboardRequest > leaderboardCooldown)
-            {
-                lastLeaderboardRequest = DateTime.Now;
-                await pointsSpenderHandler.PrintLeaderboard();
-            }
+            lastLeaderboardRequest = DateTime.Now;
+            await pointsSpenderHandler.PrintLeaderboard();
         }
     }
 }

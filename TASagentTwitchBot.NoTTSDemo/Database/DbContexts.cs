@@ -1,19 +1,17 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace TASagentTwitchBot.NoTTSDemo.Database
+namespace TASagentTwitchBot.NoTTSDemo.Database;
+
+public class DatabaseContext : Core.Database.BaseDatabaseContext
 {
-    public class DatabaseContext : Core.Database.BaseDatabaseContext
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        //Hack to force initialization to our data directory for EF Core Utilities
+        if (!BGC.IO.DataManagement.Initialized)
         {
-            //Hack to force initialization to our data directory for EF Core Utilities
-            if (!BGC.IO.DataManagement.Initialized)
-            {
-                BGC.IO.DataManagement.Initialize("TASagentBotDemo");
-            }
-
-            options.UseSqlite($"Data Source={BGC.IO.DataManagement.PathForDataFile("Config", "data.sqlite")}");
+            BGC.IO.DataManagement.Initialize("TASagentBotDemo");
         }
+
+        options.UseSqlite($"Data Source={BGC.IO.DataManagement.PathForDataFile("Config", "data.sqlite")}");
     }
 }

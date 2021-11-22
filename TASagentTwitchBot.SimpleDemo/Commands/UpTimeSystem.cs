@@ -1,68 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using TASagentTwitchBot.Core.Commands;
 
-using TASagentTwitchBot.Core.Commands;
+namespace TASagentTwitchBot.SimpleDemo.Commands;
 
-namespace TASagentTwitchBot.SimpleDemo.Commands
+public class UpTimeSystem : ICommandContainer
 {
-    public class UpTimeSystem : ICommandContainer
+    private readonly Core.Config.BotConfiguration botConfig;
+    private readonly Core.ICommunication communication;
+    private readonly Core.API.Twitch.HelixHelper helixHelper;
+
+    public UpTimeSystem(
+        Core.Config.BotConfiguration botConfig,
+        Core.ICommunication communication,
+        Core.API.Twitch.HelixHelper helixHelper)
     {
-        private readonly Core.Config.BotConfiguration botConfig;
-        private readonly Core.ICommunication communication;
-        private readonly Core.API.Twitch.HelixHelper helixHelper;
+        this.botConfig = botConfig;
+        this.communication = communication;
+        this.helixHelper = helixHelper;
+    }
 
-        public UpTimeSystem(
-            Core.Config.BotConfiguration botConfig,
-            Core.ICommunication communication,
-            Core.API.Twitch.HelixHelper helixHelper)
+    public void RegisterCommands(
+        Dictionary<string, CommandHandler> commands,
+        Dictionary<string, HelpFunction> helpFunctions,
+        Dictionary<string, SetFunction> setFunctions,
+        Dictionary<string, GetFunction> getFunctions)
+    {
+        commands.Add("uptime", UpTime);
+    }
+
+    public IEnumerable<string> GetPublicCommands()
+    {
+        yield return "uptime";
+    }
+
+    private async Task UpTime(
+        Core.IRC.TwitchChatter chatter,
+        string[] remainingCommand)
+    {
+        await PrintUpTime();
+    }
+
+    public async Task PrintUpTime()
+    {
+        Core.API.Twitch.TwitchStreams? streamResults = await helixHelper.GetStreams(userIDs: new List<string>() { botConfig.BroadcasterId });
+
+        if (streamResults is null || streamResults.Data is null || streamResults.Data.Count == 0)
         {
-            this.botConfig = botConfig;
-            this.communication = communication;
-            this.helixHelper = helixHelper;
+            communication.SendPublicChatMessage($"This channel is not currently live.");
+            return;
         }
 
-        public void RegisterCommands(
-            Dictionary<string, CommandHandler> commands,
-            Dictionary<string, HelpFunction> helpFunctions,
-            Dictionary<string, SetFunction> setFunctions,
-            Dictionary<string, GetFunction> getFunctions)
+        TimeSpan timeDiff = DateTime.Now - streamResults.Data[0].StartedAt;
+
+        if (timeDiff.Hours > 0)
         {
-            commands.Add("uptime", UpTime);
+            communication.SendPublicChatMessage($"This channel has been live for {timeDiff.Hours} Hour(s) and {timeDiff.Minutes} Minute(s)");
         }
-
-        public IEnumerable<string> GetPublicCommands()
+        else
         {
-            yield return "uptime";
-        }
-
-        private async Task UpTime(
-            Core.IRC.TwitchChatter chatter,
-            string[] remainingCommand)
-        {
-            await PrintUpTime();
-        }
-
-        public async Task PrintUpTime()
-        {
-            Core.API.Twitch.TwitchStreams streamResults = await helixHelper.GetStreams(userIDs: new List<string>() { botConfig.BroadcasterId });
-
-            if (streamResults is null || streamResults.Data is null || streamResults.Data.Count == 0)
-            {
-                communication.SendPublicChatMessage($"This channel is not currently live.");
-                return;
-            }
-
-            TimeSpan timeDiff = DateTime.Now - streamResults.Data[0].StartedAt;
-
-            if (timeDiff.Hours > 0)
-            {
-                communication.SendPublicChatMessage($"This channel has been live for {timeDiff.Hours} Hour(s) and {timeDiff.Minutes} Minute(s)");
-            }
-            else
-            {
-                communication.SendPublicChatMessage($"This channel has been live for {timeDiff.Minutes} Minute(s)");
-            }
+            communication.SendPublicChatMessage($"This channel has been live for {timeDiff.Minutes} Minute(s)");
         }
     }
 }

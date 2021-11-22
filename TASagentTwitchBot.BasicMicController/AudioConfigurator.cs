@@ -1,28 +1,24 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿namespace TASagentTwitchBot.BasicMicController;
 
-namespace TASagentTwitchBot.BasicMicController
+public class AudioConfigurator : Core.BaseConfigurator
 {
-    public class AudioConfigurator : Core.BaseConfigurator
+    public AudioConfigurator(
+        Core.Config.BotConfiguration botConfig,
+        Core.ICommunication communication,
+        Core.ErrorHandler errorHandler)
+        : base(botConfig, communication, errorHandler)
     {
-        public AudioConfigurator(
-            Core.Config.BotConfiguration botConfig,
-            Core.ICommunication communication,
-            Core.ErrorHandler errorHandler)
-            : base(botConfig, communication, errorHandler)
-        {
-        }
+    }
 
-        public override Task<bool> VerifyConfigured()
-        {
-            bool successful = true;
+    public override Task<bool> VerifyConfigured()
+    {
+        bool successful = true;
 
-            successful |= ConfigurePasswords();
+        successful |= ConfigurePasswords();
 
-            successful |= ConfigureAudioOutputDevices();
-            successful |= ConfigureAudioInputDevices();
+        successful |= ConfigureAudioOutputDevices();
+        successful |= ConfigureAudioInputDevices();
 
-            return Task.FromResult(successful);
-        }
+        return Task.FromResult(successful);
     }
 }
