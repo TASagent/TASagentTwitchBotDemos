@@ -1,10 +1,12 @@
 ﻿using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using BGC.Utility;
 
 using TASagentTwitchBot.Core.Database;
 using TASagentTwitchBot.Core.API.Twitch;
 using TASagentTwitchBot.Core.PubSub;
+using TASagentTwitchBot.SimpleDemo.Database;
 
 namespace TASagentTwitchBot.SimpleDemo.PointsSpender;
 
@@ -67,7 +69,6 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
         if (!string.IsNullOrEmpty(pointSpenderData.PointSpenderID))
         {
             //Verify
-
             TwitchCustomReward customRewards = await helixHelper.GetCustomReward(
                 id: pointSpenderData.PointSpenderID,
                 onlyManageableRewards: true) ??
@@ -89,20 +90,10 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
         if (string.IsNullOrEmpty(pointSpenderData.PointSpenderID))
         {
             //Find or Create
-
             TwitchCustomReward customRewards = await helixHelper.GetCustomReward(onlyManageableRewards: true) ??
                 throw new Exception($"Unable to get PoinstSpender CustomReward");
 
-            string pointSpenderID = "";
-
-            foreach (var customReward in customRewards.Data)
-            {
-                if (customReward.Title.Contains("Spend Channel Points") && customReward.Cost == 10_000)
-                {
-                    pointSpenderID = customReward.Id;
-                    break;
-                }
-            }
+            string? pointSpenderID = customRewards.Data.FirstOrDefault(x => x.Title.Contains("Spend Channel Points") && x.Cost == 10_000)?.Id;
 
             if (string.IsNullOrEmpty(pointSpenderID))
             {
@@ -135,45 +126,42 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
             throw new Exception($"Unable to get PoinstSpender Unfulfilled Rewards");
 
 
-        if (pendingRedemptions.Data is not null && pendingRedemptions.Data.Count > 0)
+        bool updated = false;
+
+        using IServiceScope scope = scopeFactory.CreateScope();
+        DatabaseContext db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+
+        foreach (TwitchCustomRewardRedemption.Datum redemption in pendingRedemptions.Data)
         {
-            bool updated = false;
+            User? user = await db.Users.FirstOrDefaultAsync(x => x.TwitchUserId == redemption.UserID);
 
-            using IServiceScope scope = scopeFactory.CreateScope();
-            Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
-
-            foreach (var redemption in pendingRedemptions.Data)
+            if (user is null)
             {
-                User user = db.Users.First(x => x.TwitchUserId == redemption.UserID);
-
-                if (user is null)
-                {
-                    communication.SendErrorMessage($"User not found: {redemption.UserID}");
-                    continue;
-                }
-
-                Database.SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
-
-                updated = true;
-
-                supplementalData.PointsSpent += 10;
-                supplementalData.LastPointsSpentUpdate = redemption.RedeemedAt;
-
-                await helixHelper.UpdateCustomRewardRedemptions(
-                    redemption.RewardData.Id,
-                    redemption.Id,
-                    status: "FULFILLED");
+                communication.SendErrorMessage($"User not found: {redemption.UserID}");
+                continue;
             }
 
-            if (updated)
-            {
-                await db.SaveChangesAsync();
+            SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
 
-                long totalPointsSpent = 1000 * db.SupplementalData.Select(x => (long)x.PointsSpent).Sum();
+            updated = true;
 
-                communication.SendPublicChatMessage(
-                    $"An updated total of {totalPointsSpent:N0} spent channel points.");
-            }
+            supplementalData.PointsSpent += 10;
+            supplementalData.LastPointsSpentUpdate = redemption.RedeemedAt;
+
+            await helixHelper.UpdateCustomRewardRedemptions(
+                redemption.RewardData.Id,
+                redemption.Id,
+                status: "FULFILLED");
+        }
+
+        if (updated)
+        {
+            await db.SaveChangesAsync();
+
+            long totalPointsSpent = 1000 * db.SupplementalData.Select(x => (long)x.PointsSpent).Sum();
+
+            communication.SendPublicChatMessage(
+                $"An updated total of {totalPointsSpent:N0} spent channel points.");
         }
 
     }
@@ -213,9 +201,9 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
         communication.SendDebugMessage($"Redemption: {user.TwitchUserName}");
 
         using IServiceScope scope = scopeFactory.CreateScope();
-        Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
+        DatabaseContext db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
-        Database.SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
+        SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
 
         supplementalData.PointsSpent += 10;
         supplementalData.LastPointsSpentUpdate = redemption.RedeemedAt;
@@ -229,8 +217,18 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
 
         long totalPointsSpent = 1000 * db.SupplementalData.Select(x => (long)x.PointsSpent).Sum();
 
+        int leaderboardPlacement = db.SupplementalData
+            .Include(x => x.User)
+            .AsEnumerable()
+            .Where(x => x.PointsSpent > 0)
+            .OrderByDescending(x => x.PointsSpent)
+            .ThenBy(x => x.LastPointsSpentUpdate ?? new DateTime(2020, 1, 1))
+            .Select((data, index) => new { data, index })
+            .First(x => x.data.SupplementalDataId == supplementalData.SupplementalDataId).index + 1;
+
         communication.SendPublicChatMessage(
-            $"A grand total of {totalPointsSpent:N0} Channel Points have been spent.");
+            $"{user.TwitchUserName} has now spent {1000 * supplementalData.PointsSpent:N0} channel points, " +
+            $"putting them in {leaderboardPlacement.AsPlacement()} place and making a grand total of {totalPointsSpent:N0} spent channel points.");
     }
 
     public async Task PrintLeaderboard()
@@ -243,7 +241,7 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
         const int messageLimit = 500;
 
         using IServiceScope scope = scopeFactory.CreateScope();
-        Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
+        DatabaseContext db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
         long totalPointsSpent = 1000 * db.SupplementalData.Select(x => (long)x.PointsSpent).Sum();
 
@@ -251,7 +249,9 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
             .Include(x => x.User)
             .Where(x => x.PointsSpent > 0)
             .OrderByDescending(x => x.PointsSpent)
-            .ThenBy(x => x.LastPointsSpentUpdate ?? new DateTime(2020, 1, 1)).Take(5).ToList();
+            .ThenBy(x => x.LastPointsSpentUpdate ?? new DateTime(2020, 1, 1))
+            .Take(5)
+            .ToList();
 
         StringBuilder leaderboard = new StringBuilder($"A total of {totalPointsSpent:N0} Channel Points have been spent. Spending leaders: ");
 
@@ -290,18 +290,31 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
         }
 
         using IServiceScope scope = scopeFactory.CreateScope();
-        Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
+        DatabaseContext db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
-        Database.SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
+        SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
 
         if (supplementalData.PointsSpent > 0)
         {
+            long totalPointsSpent = 1000 * db.SupplementalData.Select(x => (long)x.PointsSpent).Sum();
+
+            int placement = db.SupplementalData
+                .Include(x => x.User)
+                .AsEnumerable()
+                .Where(x => x.PointsSpent > 0)
+                .OrderByDescending(x => x.PointsSpent)
+                .ThenBy(x => x.LastPointsSpentUpdate ?? new DateTime(2020, 1, 1))
+                .Select((data, index) => new { data, index })
+                .First(x => x.data.SupplementalDataId == supplementalData.SupplementalDataId).index + 1;
+
             communication.SendPublicChatMessage(
-                $"@{user.TwitchUserName}, you have spent {supplementalData.PointsSpent * 1000:N0} Channel Points.");
+                $"@{user.TwitchUserName}, you have spent {supplementalData.PointsSpent * 1000:N0} channel points " +
+                $"of the cumulative {totalPointsSpent:N0} that have been spent on this redemption, " +
+                $"putting you in {placement.AsPlacement()} place on the leaderboard.");
         }
         else
         {
-            communication.SendPublicChatMessage($"@{user.TwitchUserName}, you have never spent any Channel Points.");
+            communication.SendPublicChatMessage($"@{user.TwitchUserName}, you have never spent any channel points with the Spend Channel Points redemption.");
             return;
         }
     }
@@ -316,7 +329,7 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
         otherUserName = otherUserName.ToLower();
 
         using IServiceScope scope = scopeFactory.CreateScope();
-        Database.DatabaseContext db = scope.ServiceProvider.GetRequiredService<Database.DatabaseContext>();
+        DatabaseContext db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
         User? otherUser = await db.Users.FirstOrDefaultAsync(x => x.TwitchUserName.ToLower() == otherUserName);
 
@@ -326,19 +339,34 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
             return;
         }
 
-        Database.SupplementalData otherUserData = await db.GetSupplementalDataAsync(otherUser);
+        SupplementalData otherUserData = await db.GetSupplementalDataAsync(otherUser);
+
+        long totalPointsSpent = 1000 * db.SupplementalData.Select(x => (long)x.PointsSpent).Sum();
+
+        int placement = db.SupplementalData
+            .Include(x => x.User)
+            .AsEnumerable()
+            .Where(x => x.PointsSpent > 0)
+            .OrderByDescending(x => x.PointsSpent)
+            .ThenBy(x => x.LastPointsSpentUpdate ?? new DateTime(2020, 1, 1))
+            .Select((data, index) => new { data, index })
+            .First(x => x.data.SupplementalDataId == otherUserData.SupplementalDataId).index + 1;
 
         if (otherUser == requester)
         {
             //Someone targeted themselves
             communication.SendPublicChatMessage(
-                $"@{requester.TwitchUserName}, you have spent {otherUserData.PointsSpent * 1000:N0} Channel Points.");
+                $"@{requester.TwitchUserName}, you have spent {otherUserData.PointsSpent * 1000:N0} Channel Points " +
+                $"of the cumulative {totalPointsSpent:N0} that have been spent " +
+                $"(putting you in {placement.AsPlacement()} place on the leaderboard).");
 
             return;
         }
 
         communication.SendPublicChatMessage(
-            $"@{requester.TwitchUserName}, it seems {otherUser.TwitchUserName} has spent {otherUserData.PointsSpent * 1000:N0} Channel Points.");
+            $"@{requester.TwitchUserName}, it seems {otherUser.TwitchUserName} has spent {otherUserData.PointsSpent * 1000:N0} Channel Points " +
+            $"of the cumulative {totalPointsSpent:N0} that have been spent " +
+            $"(putting them in {placement.AsPlacement()} place on the leaderboard).");
     }
 
     protected virtual void Dispose(bool disposing)
