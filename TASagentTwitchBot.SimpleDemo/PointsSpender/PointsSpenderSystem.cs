@@ -18,14 +18,10 @@ public class PointsSpenderSystem : ICommandContainer
         this.pointsSpenderHandler = pointsSpenderHandler;
     }
 
-    public void RegisterCommands(
-        Dictionary<string, CommandHandler> commands,
-        Dictionary<string, HelpFunction> helpFunctions,
-        Dictionary<string, SetFunction> setFunctions,
-        Dictionary<string, GetFunction> getFunctions)
+    public void RegisterCommands(ICommandRegistrar commandRegistrar)
     {
-        commands.Add("points", PointsHandler);
-        commands.Add("leaderboard", LeaderboardHandler);
+        commandRegistrar.RegisterGlobalCommand("points", PointsHandler);
+        commandRegistrar.RegisterGlobalCommand("leaderboard", LeaderboardHandler);
     }
 
     public IEnumerable<string> GetPublicCommands()

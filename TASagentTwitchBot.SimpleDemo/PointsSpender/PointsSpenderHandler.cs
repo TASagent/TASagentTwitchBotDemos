@@ -104,10 +104,7 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
                     enabled: true,
                     backgroundColor: "#56BDE6",
                     userInputRequired: false,
-                    maxPerStreamEnabled: false,
-                    maxPerUserPerStreamEnabled: false,
-                    globalCooldownEnabled: false,
-                    redemptionsSkipQueue: false) ??
+                    skipQueue: false) ??
                     throw new Exception($"Unable to create PoinstSpender CustomReward");
 
                 pointSpenderID = creationResponse.Data[0].Id;

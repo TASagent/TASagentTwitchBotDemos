@@ -129,6 +129,10 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.SystemCommandSystem>()
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.PermissionSystem>();
 
+//Core Credit System
+builder.Services
+    .AddSingleton<TASagentTwitchBot.Core.Credit.ICreditManager, TASagentTwitchBot.Core.Credit.DisabledCreditManager>();
+
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {

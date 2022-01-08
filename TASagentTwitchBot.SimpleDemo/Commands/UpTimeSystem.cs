@@ -18,13 +18,9 @@ public class UpTimeSystem : ICommandContainer
         this.helixHelper = helixHelper;
     }
 
-    public void RegisterCommands(
-        Dictionary<string, CommandHandler> commands,
-        Dictionary<string, HelpFunction> helpFunctions,
-        Dictionary<string, SetFunction> setFunctions,
-        Dictionary<string, GetFunction> getFunctions)
+    public void RegisterCommands(ICommandRegistrar commandRegistrar)
     {
-        commands.Add("uptime", UpTime);
+        commandRegistrar.RegisterGlobalCommand("uptime", UpTime);
     }
 
     public IEnumerable<string> GetPublicCommands()

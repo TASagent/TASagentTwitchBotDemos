@@ -156,7 +156,7 @@ builder.Services.RegisterTTTASServices();
 //Core Commands
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Commands.CommandSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.CustomSimpleCommands>()
+    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.CustomCommands>()
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.SystemCommandSystem>()
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.PermissionSystem>()
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Quotes.QuoteSystem>();
@@ -164,6 +164,11 @@ builder.Services
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.SimpleDemo.Commands.UpTimeSystem>()
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.SimpleDemo.Commands.TestCommandSystem>();
+
+//Core Credit System
+builder.Services
+    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Credit.BasicCreditCommandSystem>()
+    .AddSingleton<TASagentTwitchBot.Core.Credit.ICreditManager, TASagentTwitchBot.Core.Credit.SimpleCreditManager>();
 
 //Custom Point-spender System
 builder.Services
