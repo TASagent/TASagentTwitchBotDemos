@@ -24,7 +24,7 @@ IMvcBuilder mvcBuilder = builder.Services.GetMvcBuilder();
 mvcBuilder.AddControllerSpyControllerAssembly();
 
 //Register Core Controllers (with potential exclusions) 
-mvcBuilder.RegisterControllersWithoutFeatures(new[] { "TTS" });
+mvcBuilder.RegisterControllersWithoutFeatures("TTS");
 
 //Add SignalR for Hubs
 builder.Services.AddSignalR();
@@ -161,7 +161,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 // Construct application
 //
 
-WebApplication? app = builder.Build();
+using WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {

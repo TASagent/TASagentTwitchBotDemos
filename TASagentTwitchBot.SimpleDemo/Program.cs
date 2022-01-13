@@ -189,7 +189,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 // Construct application
 //
 
-WebApplication? app = builder.Build();
+using WebApplication app = builder.Build();
 
 //Handle forwarding properly
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -313,6 +313,27 @@ catch (Exception ex)
     errorHandler.LogFatalException(ex);
 }
 
+
+//
+// Register SkipCombo for SNES controller
+// If SNES controller is active, and user holds L, and taps R twice, the ActivityDispatcher will skip the current notification
+//
+
+TASagentTwitchBot.Plugin.ControllerSpy.IControllerManager controllerManager =
+    app.Services.GetRequiredService<TASagentTwitchBot.Plugin.ControllerSpy.IControllerManager>();
+TASagentTwitchBot.Core.Notifications.IActivityDispatcher activityDispatcher =
+    app.Services.GetRequiredService<TASagentTwitchBot.Core.Notifications.IActivityDispatcher>();
+
+controllerManager.RegisterAction(
+    sequence: new List<TASagentTwitchBot.Plugin.ControllerSpy.Readers.NewControllerState>()
+    {
+        new TASagentTwitchBot.Plugin.ControllerSpy.Readers.SNESControllerState(l: true),
+        new TASagentTwitchBot.Plugin.ControllerSpy.Readers.SNESControllerState(l: true, r: true),
+        new TASagentTwitchBot.Plugin.ControllerSpy.Readers.SNESControllerState(l: true),
+        new TASagentTwitchBot.Plugin.ControllerSpy.Readers.SNESControllerState(l: true, r: true)
+    },
+    name: "Skip",
+    callback: activityDispatcher.Skip);
 
 //
 // Wait for signal to end application

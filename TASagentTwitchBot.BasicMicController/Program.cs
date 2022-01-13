@@ -17,7 +17,7 @@ builder.WebHost
 IMvcBuilder mvcBuilder = builder.Services.GetMvcBuilder();
 
 //Register Core Controllers (with potential exclusions) 
-mvcBuilder.RegisterControllersWithoutFeatures(new[] { "TTS", "Overlay", "Notifications", "Database" });
+mvcBuilder.RegisterControllersWithoutFeatures("TTS", "Overlay", "Notifications", "Database");
 
 //Add SignalR for Hubs
 builder.Services.AddSignalR();
@@ -70,7 +70,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 // Construct application
 //
 
-WebApplication? app = builder.Build();
+using WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
