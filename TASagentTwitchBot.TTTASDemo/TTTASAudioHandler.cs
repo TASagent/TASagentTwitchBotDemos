@@ -57,7 +57,7 @@ public class TTTASAudioHandler : Plugin.TTTAS.ITTTASHandler, IDisposable
             if (tttasSoundEffect is null)
             {
                 communication.SendWarningMessage($"Expected {tttasConfig.FeatureNameBrief} SoundEffect \"{tttasConfig.SoundEffect}\" not found.  Defaulting to first sound effect.");
-                tttasSoundEffect = soundEffectSystem.GetSoundEffectByName(soundEffectSystem.GetSoundEffects()[0]);
+                tttasSoundEffect = soundEffectSystem.GetAnySoundEffect();
             }
 
             if (tttasSoundEffect is not null)

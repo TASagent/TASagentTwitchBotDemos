@@ -46,7 +46,7 @@ public class CustomActivityProvider : FullActivityProvider
         if (testSoundEffect is null)
         {
             communication.SendWarningMessage($"Expected Test SoundEffect not found.  Defaulting to first");
-            testSoundEffect = soundEffectSystem.GetSoundEffectByName(soundEffectSystem.GetSoundEffects()[0]);
+            testSoundEffect = soundEffectSystem.GetAnySoundEffect();
         }
 
         if (testSoundEffect is not null)

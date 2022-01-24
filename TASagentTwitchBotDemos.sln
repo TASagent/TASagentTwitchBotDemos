@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.TTTASDemo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Core.WebServer", "TASagentTwitchBotCore\TASagentTwitchBot.Core.WebServer\TASagentTwitchBot.Core.WebServer.csproj", "{AF1AC4E3-0451-4221-9771-E67701E89648}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.WebTTSOnly", "TASagentTwitchBot.WebTTSOnly\TASagentTwitchBot.WebTTSOnly.csproj", "{88C25BC4-B0E3-4FCA-8148-886531716153}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{AF1AC4E3-0451-4221-9771-E67701E89648}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF1AC4E3-0451-4221-9771-E67701E89648}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF1AC4E3-0451-4221-9771-E67701E89648}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88C25BC4-B0E3-4FCA-8148-886531716153}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88C25BC4-B0E3-4FCA-8148-886531716153}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88C25BC4-B0E3-4FCA-8148-886531716153}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88C25BC4-B0E3-4FCA-8148-886531716153}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

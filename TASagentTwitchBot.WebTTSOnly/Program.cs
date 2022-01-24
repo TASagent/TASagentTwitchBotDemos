@@ -3,9 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 using TASagentTwitchBot.Core.Extensions;
 using TASagentTwitchBot.Core.Web;
+using TASagentTwitchBot.Plugin.ControllerSpy.Web;
 
 //Initialize DataManagement
-BGC.IO.DataManagement.Initialize("TASagentBotDemo");
+BGC.IO.DataManagement.Initialize("TASagentBotWebTTSOnly");
 
 //
 // Define and register services
@@ -19,40 +20,42 @@ builder.WebHost
 
 IMvcBuilder mvcBuilder = builder.Services.GetMvcBuilder();
 
+//Register ControllerSpy for inclusion
+mvcBuilder.AddControllerSpyControllerAssembly();
+
 //Register Core Controllers (with potential exclusions) 
-mvcBuilder.RegisterControllersWithoutFeatures("Overlay");
+mvcBuilder.RegisterControllersWithoutFeatures("Midi");
 
 //Add SignalR for Hubs
 builder.Services.AddSignalR();
 
 //Custom Database
 builder.Services
-    .AddDbContext<TASagentTwitchBot.NoOverlaysDemo.Database.DatabaseContext>();
+    .AddDbContext<TASagentTwitchBot.WebTTSOnly.Database.DatabaseContext>();
 
 //Register custom database to be served for BaseDatabaseContext
 builder.Services
-    .AddScoped<TASagentTwitchBot.Core.Database.BaseDatabaseContext>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Database.DatabaseContext>());
+    .AddScoped<TASagentTwitchBot.Core.Database.BaseDatabaseContext>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Database.DatabaseContext>());
 
 //Core Agnostic Systems
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Config.BotConfiguration>(TASagentTwitchBot.Core.Config.BotConfiguration.GetConfig())
-    .AddSingleton<TASagentTwitchBot.Core.IConfigurator, TASagentTwitchBot.Core.StandardConfigurator>()
     .AddSingleton<TASagentTwitchBot.Core.ICommunication, TASagentTwitchBot.Core.CommunicationHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.View.IConsoleOutput, TASagentTwitchBot.Core.View.BasicView>()
     .AddSingleton<TASagentTwitchBot.Core.ErrorHandler>()
     .AddSingleton<TASagentTwitchBot.Core.ApplicationManagement>()
     .AddSingleton<TASagentTwitchBot.Core.Chat.ChatLogger>()
     .AddSingleton<TASagentTwitchBot.Core.IMessageAccumulator, TASagentTwitchBot.Core.MessageAccumulator>();
+
+builder.Services
+    .AddSingleton<TASagentTwitchBot.Core.View.IConsoleOutput, TASagentTwitchBot.WebTTSOnly.WebTTSOnlyView>()
+    .AddSingleton<TASagentTwitchBot.Core.IConfigurator, TASagentTwitchBot.WebTTSOnly.WebTTSOnlyConfigurator>();
 
 //Core Twitch Systems
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.API.Twitch.HelixHelper>()
     .AddSingleton<TASagentTwitchBot.Core.API.Twitch.IBotTokenValidator, TASagentTwitchBot.Core.API.Twitch.BotTokenValidator>()
     .AddSingleton<TASagentTwitchBot.Core.API.Twitch.IBroadcasterTokenValidator, TASagentTwitchBot.Core.API.Twitch.BroadcasterTokenValidator>()
-    .AddSingleton<TASagentTwitchBot.Core.Database.IUserHelper, TASagentTwitchBot.Core.Database.UserHelper>()
-    .AddSingleton<TASagentTwitchBot.Core.Bits.CheerDispatcher>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.TestCommandSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.ShoutOutSystem>();
+    .AddSingleton<TASagentTwitchBot.Core.Database.IUserHelper, TASagentTwitchBot.Core.Database.UserHelper>();
 
 //Core Twitch Chat Systems
 builder.Services
@@ -60,6 +63,11 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.IRC.IIRCLogger, TASagentTwitchBot.Core.IRC.IRCLogger>()
     .AddSingleton<TASagentTwitchBot.Core.IRC.INoticeHandler, TASagentTwitchBot.Core.IRC.NoticeHandler>()
     .AddSingleton<TASagentTwitchBot.Core.Chat.IChatMessageHandler, TASagentTwitchBot.Core.Chat.ChatMessageHandler>();
+
+//Definition System
+builder.Services
+    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.DictionarySystem>()
+    .AddSingleton<TASagentTwitchBot.Core.API.Dictionary.DictionaryHelper>();
 
 //Notification System
 //Core Notifications
@@ -69,20 +77,22 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Notifications.IActivityDispatcher, TASagentTwitchBot.Core.Notifications.ActivityDispatcher>();
 //Custom Notification
 builder.Services
-    .AddSingleton<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ICheerHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IRaidHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IGiftSubHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IFollowerHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ITTSHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>());
+    .AddSingleton<TASagentTwitchBot.WebTTSOnly.Notifications.TTSOnlyActivityProvider>()
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.ITTSHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.TTSOnlyActivityProvider>());
+
+builder.Services
+    .AddSingleton<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>()
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>())
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.ICheerHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>())
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.IRaidHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>())
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.IGiftSubHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>())
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.IFollowerHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>());
 
 //Core Audio System
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Audio.IAudioPlayer, TASagentTwitchBot.Core.Audio.AudioPlayer>()
     .AddSingleton<TASagentTwitchBot.Core.Audio.IMicrophoneHandler, TASagentTwitchBot.Core.Audio.MicrophoneHandler>()
     .AddSingleton<TASagentTwitchBot.Core.Audio.ISoundEffectSystem, TASagentTwitchBot.Core.Audio.SoundEffectSystem>();
-
 
 //Core Audio Effects System
 builder.Services
@@ -100,40 +110,42 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.PubSub.PubSubClient>()
     .AddSingleton<TASagentTwitchBot.Core.PubSub.IRedemptionSystem, TASagentTwitchBot.Core.PubSub.RedemptionSystem>();
 
-//Core Midi System
+//Core Emote Effects System
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Audio.MidiKeyboardHandler>();
+    .AddSingleton<TASagentTwitchBot.Core.API.BTTV.BTTVHelper>()
+    .AddSingleton<TASagentTwitchBot.Core.EmoteEffects.EmoteEffectConfiguration>(TASagentTwitchBot.Core.EmoteEffects.EmoteEffectConfiguration.GetConfig())
+    .AddSingleton<TASagentTwitchBot.Core.EmoteEffects.IEmoteEffectListener, TASagentTwitchBot.Core.EmoteEffects.EmoteEffectListener>()
+    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.EmoteEffects.EmoteEffectSystem>();
 
 //Core WebServer Config (Shared by WebTTS and EventSub)
 builder.Services
     .AddSingleton(TASagentTwitchBot.Core.Config.ServerConfig.GetConfig());
 
-//Core Web TTS System
+//Core Local TTS System
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.TTS.TTSConfiguration>(TASagentTwitchBot.Core.TTS.TTSConfiguration.GetConfig())
     .AddSingleton<TASagentTwitchBot.Core.TTS.ITTSRenderer, TASagentTwitchBot.Core.TTS.TTSWebRenderer>()
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.TTS.TTSSystem>();
 
+
 //EventSub System
 //Core EventSub
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.EventSub.EventSubHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.EventSub.IEventSubSubscriber, TASagentTwitchBot.Core.EventSub.FollowSubscriber>()
-    .AddSingleton<TASagentTwitchBot.Core.EventSub.IEventSubSubscriber, TASagentTwitchBot.Core.EventSub.StreamChangeSubscriber>();
+    .AddSingleton<TASagentTwitchBot.Core.EventSub.IEventSubSubscriber, TASagentTwitchBot.Core.EventSub.FollowSubscriber>();
+
+//Core Timer System
+builder.Services.AddSingleton<TASagentTwitchBot.Core.Timer.ITimerManager, TASagentTwitchBot.Core.Timer.TimerManager>();
+
+//Core Controller Overlay
+builder.Services.RegisterControllerSpyServices();
 
 //Command System
 //Core Commands
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Commands.CommandSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.CustomCommands>()
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.SystemCommandSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.PermissionSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Quotes.QuoteSystem>();
-
-//Core Credit System
-builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Credit.BasicCreditCommandSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Credit.ICreditManager, TASagentTwitchBot.Core.Credit.SimpleCreditManager>();
+    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.PermissionSystem>();
 
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -141,7 +153,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
         Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
 });
-
 
 //
 // Finished defining services
@@ -171,14 +182,27 @@ app.UseStaticFiles();
 //Core Web Assets
 app.UseCoreLibraryContent("TASagentTwitchBot.Core");
 
+//Core Controllerspy Assets
+app.UseCoreLibraryContent("TASagentTwitchBot.Plugin.ControllerSpy");
+
 //Authentication Middleware
 app.UseMiddleware<TASagentTwitchBot.Core.Web.Middleware.AuthCheckerMiddleware>();
 
 //Map all Core Non-excluded controllers
 app.MapControllers();
 
+//Core TTS Overlay Hub
+app.MapHub<TASagentTwitchBot.Core.Web.Hubs.TTSMarqueeHub>("/Hubs/TTSMarquee");
+
 //Core Control Page Hub
 app.MapHub<TASagentTwitchBot.Core.Web.Hubs.MonitorHub>("/Hubs/Monitor");
+
+//Core Timer Hub
+app.MapHub<TASagentTwitchBot.Core.Web.Hubs.TimerHub>("/Hubs/Timer");
+
+//Core ControllerSpy Endpoints
+app.RegisterControllerSpyEndpoints();
+
 
 await app.StartAsync();
 
@@ -188,13 +212,14 @@ await app.StartAsync();
 
 using (IServiceScope serviceScope = app.Services.GetService<IServiceScopeFactory>()!.CreateScope())
 {
-    TASagentTwitchBot.NoOverlaysDemo.Database.DatabaseContext context = serviceScope.ServiceProvider!.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Database.DatabaseContext>();
+    TASagentTwitchBot.WebTTSOnly.Database.DatabaseContext context = serviceScope.ServiceProvider!.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Database.DatabaseContext>();
     context.Database.Migrate();
 }
 
 //
 // Construct and run Configurator
 //
+
 
 TASagentTwitchBot.Core.ICommunication communication = app.Services.GetRequiredService<TASagentTwitchBot.Core.ICommunication>();
 TASagentTwitchBot.Core.IConfigurator configurator = app.Services.GetRequiredService<TASagentTwitchBot.Core.IConfigurator>();
@@ -226,16 +251,13 @@ TASagentTwitchBot.Core.API.Twitch.IBroadcasterTokenValidator broadcasterTokenVal
 
 app.Services.GetRequiredService<TASagentTwitchBot.Core.Commands.CommandSystem>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.EventSub.EventSubHandler>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.Bits.CheerDispatcher>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.Audio.IMicrophoneHandler>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.Audio.MidiKeyboardHandler>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.IMessageAccumulator>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.IRC.IrcClient>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.PubSub.PubSubClient>();
 
 try
 {
-    communication.SendDebugMessage("*** Starting Up No Overlays Demo ***");
+    communication.SendDebugMessage("*** Starting Up ***");
 
     //Kick off Validators
     botTokenValidator.RunValidator();
@@ -245,7 +267,6 @@ catch (Exception ex)
 {
     errorHandler.LogFatalException(ex);
 }
-
 
 //
 // Wait for signal to end application

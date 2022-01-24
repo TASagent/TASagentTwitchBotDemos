@@ -145,7 +145,7 @@ public class NoTTSActivityProvider :
             if (subSoundEffect is null)
             {
                 communication.SendWarningMessage($"Expected Sub SoundEffect not found.  Defaulting to first sound effect.");
-                subSoundEffect = soundEffectSystem.GetSoundEffectByName(soundEffectSystem.GetSoundEffects()[0]);
+                subSoundEffect = soundEffectSystem.GetAnySoundEffect();
             }
 
             if (subSoundEffect is not null)
@@ -283,7 +283,7 @@ public class NoTTSActivityProvider :
             if (cheerSoundEffect is null)
             {
                 communication.SendWarningMessage($"Expected Cheer SoundEffect not found.  Defaulting to first");
-                cheerSoundEffect = soundEffectSystem.GetSoundEffectByName(soundEffectSystem.GetSoundEffects()[0]);
+                cheerSoundEffect = soundEffectSystem.GetAnySoundEffect();
             }
 
             if (cheerSoundEffect is not null)
@@ -370,7 +370,7 @@ public class NoTTSActivityProvider :
             if (raidSoundEffect is null)
             {
                 communication.SendWarningMessage($"Expected Raid SoundEffect not found.  Defaulting to first");
-                raidSoundEffect = soundEffectSystem.GetSoundEffectByName(soundEffectSystem.GetSoundEffects()[0]);
+                raidSoundEffect = soundEffectSystem.GetAnySoundEffect();
             }
 
             if (raidSoundEffect is not null)
@@ -466,7 +466,7 @@ public class NoTTSActivityProvider :
             if (giftSubSoundEffect is null)
             {
                 communication.SendWarningMessage($"Expected GiftSub SoundEffect not found.  Defaulting to first");
-                giftSubSoundEffect = soundEffectSystem.GetSoundEffectByName(soundEffectSystem.GetSoundEffects()[0]);
+                giftSubSoundEffect = soundEffectSystem.GetAnySoundEffect();
             }
 
             if (giftSubSoundEffect is not null)
@@ -584,7 +584,7 @@ public class NoTTSActivityProvider :
             if (anonGiftSubSoundEffect is null)
             {
                 communication.SendWarningMessage($"Expected GiftSub SoundEffect not found.  Defaulting to first");
-                anonGiftSubSoundEffect = soundEffectSystem.GetSoundEffectByName(soundEffectSystem.GetSoundEffects()[0]);
+                anonGiftSubSoundEffect = soundEffectSystem.GetAnySoundEffect();
             }
 
             if (anonGiftSubSoundEffect is not null)
@@ -693,7 +693,7 @@ public class NoTTSActivityProvider :
             if (followSoundEffect is null)
             {
                 communication.SendWarningMessage($"Expected Follow SoundEffect not found.  Defaulting to first");
-                followSoundEffect = soundEffectSystem.GetSoundEffectByName(soundEffectSystem.GetSoundEffects()[0]);
+                followSoundEffect = soundEffectSystem.GetAnySoundEffect();
             }
 
             if (followSoundEffect is not null)
