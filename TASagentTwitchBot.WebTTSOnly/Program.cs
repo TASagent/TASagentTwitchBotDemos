@@ -81,12 +81,11 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Notifications.ITTSHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.TTSOnlyActivityProvider>());
 
 builder.Services
-    .AddSingleton<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>()
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ICheerHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IRaidHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IGiftSubHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IFollowerHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.ActivityProviderStubs>());
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler, TASagentTwitchBot.Core.Notifications.SubscriptionHandlerStub>()
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.ICheerHandler, TASagentTwitchBot.Core.Notifications.CheerHandlerStub>()
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.IRaidHandler, TASagentTwitchBot.Core.Notifications.RaidHandlerStub>()
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.IGiftSubHandler, TASagentTwitchBot.Core.Notifications.GiftSubHandlerStub>()
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.IFollowerHandler, TASagentTwitchBot.Core.Notifications.FollowerHandlerStub>();
 
 //Core Audio System
 builder.Services
@@ -234,14 +233,14 @@ if (!configurationSuccessful)
     communication.SendErrorMessage($"Configuration unsuccessful.  Aborting.");
 
     await app.StopAsync();
-
-    Environment.Exit(1);
+    await Task.Delay(15_000);
     return;
 }
 
 //
 // Construct required components and run
 //
+    communication.SendDebugMessage("*** Starting Up ***");
 
 TASagentTwitchBot.Core.ErrorHandler errorHandler = app.Services.GetRequiredService<TASagentTwitchBot.Core.ErrorHandler>();
 TASagentTwitchBot.Core.ApplicationManagement applicationManagement = app.Services.GetRequiredService<TASagentTwitchBot.Core.ApplicationManagement>();
@@ -255,18 +254,10 @@ app.Services.GetRequiredService<TASagentTwitchBot.Core.IMessageAccumulator>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.IRC.IrcClient>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.PubSub.PubSubClient>();
 
-try
-{
-    communication.SendDebugMessage("*** Starting Up ***");
+//Kick off Validators
+botTokenValidator.RunValidator();
+broadcasterTokenValidator.RunValidator();
 
-    //Kick off Validators
-    botTokenValidator.RunValidator();
-    broadcasterTokenValidator.RunValidator();
-}
-catch (Exception ex)
-{
-    errorHandler.LogFatalException(ex);
-}
 
 //
 // Wait for signal to end application

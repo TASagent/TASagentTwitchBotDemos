@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Core.WebS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.WebTTSOnly", "TASagentTwitchBot.WebTTSOnly\TASagentTwitchBot.WebTTSOnly.csproj", "{88C25BC4-B0E3-4FCA-8148-886531716153}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.EmoteEffectsDemo", "TASagentTwitchBot.EmoteEffectsDemo\TASagentTwitchBot.EmoteEffectsDemo.csproj", "{9E3475BB-B742-46DB-8116-033683D75723}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{88C25BC4-B0E3-4FCA-8148-886531716153}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88C25BC4-B0E3-4FCA-8148-886531716153}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88C25BC4-B0E3-4FCA-8148-886531716153}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E3475BB-B742-46DB-8116-033683D75723}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E3475BB-B742-46DB-8116-033683D75723}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E3475BB-B742-46DB-8116-033683D75723}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E3475BB-B742-46DB-8116-033683D75723}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

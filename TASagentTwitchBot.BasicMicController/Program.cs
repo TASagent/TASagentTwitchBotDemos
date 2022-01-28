@@ -115,14 +115,15 @@ if (!configurationSuccessful)
     communication.SendErrorMessage($"Configuration unsuccessful. Aborting.");
 
     await app.StopAsync();
-
-    Environment.Exit(1);
+    await Task.Delay(15_000);
     return;
 }
 
 //
 // Construct required components and run
 //
+
+communication.SendDebugMessage("*** Starting Up Basic Mic Application ***");
 
 TASagentTwitchBot.Core.ErrorHandler errorHandler = app.Services.GetRequiredService<TASagentTwitchBot.Core.ErrorHandler>();
 TASagentTwitchBot.Core.ApplicationManagement applicationManagement = app.Services.GetRequiredService<TASagentTwitchBot.Core.ApplicationManagement>();
@@ -131,7 +132,6 @@ app.Services.GetRequiredService<TASagentTwitchBot.Core.Audio.IMicrophoneHandler>
 app.Services.GetRequiredService<TASagentTwitchBot.Core.Audio.MidiKeyboardHandler>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.IMessageAccumulator>();
 
-communication.SendDebugMessage("*** Starting Up Basic Mic Application ***");
 
 //
 // Wait for signal to end application

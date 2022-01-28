@@ -155,36 +155,3 @@ public class TTSOnlyActivityProvider :
         public override string ToString() => description;
     }
 }
-
-public class ActivityProviderStubs : IRaidHandler, IGiftSubHandler, IFollowerHandler, ICheerHandler, ISubscriptionHandler
-{
-    public void HandleAnonGiftSub(string recipientId, int tier, int months, bool approved)
-    {
-        //Do nothing
-    }
-
-    public void HandleCheer(User cheerer, string message, int quantity, bool approved)
-    {
-        //Do nothing
-    }
-
-    public void HandleFollower(User follower, bool approved)
-    {
-        //Do nothing
-    }
-
-    public void HandleGiftSub(string senderId, string recipientId, int tier, int months, bool approved)
-    {
-        //Do nothing
-    }
-
-    public void HandleRaid(string raiderId, int count, bool approved)
-    {
-        //Do nothing
-    }
-
-    public void HandleSubscription(string userId, string message, int monthCount, int tier, bool approved)
-    {
-        //Do nothing
-    }
-}
