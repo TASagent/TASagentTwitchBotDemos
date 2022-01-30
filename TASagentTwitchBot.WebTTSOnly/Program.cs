@@ -55,7 +55,8 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.API.Twitch.HelixHelper>()
     .AddSingleton<TASagentTwitchBot.Core.API.Twitch.IBotTokenValidator, TASagentTwitchBot.Core.API.Twitch.BotTokenValidator>()
     .AddSingleton<TASagentTwitchBot.Core.API.Twitch.IBroadcasterTokenValidator, TASagentTwitchBot.Core.API.Twitch.BroadcasterTokenValidator>()
-    .AddSingleton<TASagentTwitchBot.Core.Database.IUserHelper, TASagentTwitchBot.Core.Database.UserHelper>();
+    .AddSingleton<TASagentTwitchBot.Core.Database.IUserHelper, TASagentTwitchBot.Core.Database.UserHelper>()
+    .AddSingleton<TASagentTwitchBot.Core.Bits.CheerHelper>();
 
 //Core Twitch Chat Systems
 builder.Services
@@ -240,7 +241,7 @@ if (!configurationSuccessful)
 //
 // Construct required components and run
 //
-    communication.SendDebugMessage("*** Starting Up ***");
+communication.SendDebugMessage("*** Starting Up ***");
 
 TASagentTwitchBot.Core.ErrorHandler errorHandler = app.Services.GetRequiredService<TASagentTwitchBot.Core.ErrorHandler>();
 TASagentTwitchBot.Core.ApplicationManagement applicationManagement = app.Services.GetRequiredService<TASagentTwitchBot.Core.ApplicationManagement>();
