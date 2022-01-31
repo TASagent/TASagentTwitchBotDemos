@@ -137,7 +137,7 @@ builder.Services
 //Core Timer System
 builder.Services.AddSingleton<TASagentTwitchBot.Core.Timer.ITimerManager, TASagentTwitchBot.Core.Timer.TimerManager>();
 
-//Core Controller Overlay
+//Controller Overlay
 builder.Services.RegisterControllerSpyServices();
 
 //Command System
@@ -182,7 +182,7 @@ app.UseStaticFiles();
 //Core Web Assets
 app.UseCoreLibraryContent("TASagentTwitchBot.Core");
 
-//Core Controllerspy Assets
+//Controllerspy Assets
 app.UseCoreLibraryContent("TASagentTwitchBot.Plugin.ControllerSpy");
 
 //Authentication Middleware
@@ -200,7 +200,7 @@ app.MapHub<TASagentTwitchBot.Core.Web.Hubs.MonitorHub>("/Hubs/Monitor");
 //Core Timer Hub
 app.MapHub<TASagentTwitchBot.Core.Web.Hubs.TimerHub>("/Hubs/Timer");
 
-//Core ControllerSpy Endpoints
+//ControllerSpy Endpoints
 app.RegisterControllerSpyEndpoints();
 
 

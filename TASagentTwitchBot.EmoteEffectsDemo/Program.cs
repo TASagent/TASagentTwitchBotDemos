@@ -55,7 +55,8 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.API.Twitch.HelixHelper>()
     .AddSingleton<TASagentTwitchBot.Core.API.Twitch.IBotTokenValidator, TASagentTwitchBot.Core.API.Twitch.BotTokenValidator>()
     .AddSingleton<TASagentTwitchBot.Core.API.Twitch.IBroadcasterTokenValidator, TASagentTwitchBot.Core.API.Twitch.BroadcasterTokenValidator>()
-    .AddSingleton<TASagentTwitchBot.Core.Database.IUserHelper, TASagentTwitchBot.Core.Database.UserHelper>();
+    .AddSingleton<TASagentTwitchBot.Core.Database.IUserHelper, TASagentTwitchBot.Core.Database.UserHelper>()
+    .AddSingleton<TASagentTwitchBot.Core.Bits.CheerHelper>();
 
 //Core Twitch Chat Systems
 builder.Services
@@ -131,7 +132,7 @@ app.UseStaticFiles();
 //Core Web Assets
 app.UseCoreLibraryContent("TASagentTwitchBot.Core");
 
-//Core Controllerspy Assets
+//Controllerspy Assets
 app.UseCoreLibraryContent("TASagentTwitchBot.Plugin.ControllerSpy");
 
 //Authentication Middleware
@@ -149,7 +150,7 @@ app.MapHub<TASagentTwitchBot.Core.Web.Hubs.TimerHub>("/Hubs/Timer");
 //Core Emote Effect Overlay Hub
 app.MapHub<TASagentTwitchBot.Core.Web.Hubs.EmoteHub>("/Hubs/Emote");
 
-//Core ControllerSpy Endpoints
+//ControllerSpy Endpoints
 app.RegisterControllerSpyEndpoints();
 
 

@@ -36,40 +36,7 @@ namespace TASagentTwitchBot.EmoteEffectsDemo.Migrations
 
                     b.HasKey("CustomTextCommandId");
 
-                    b.ToTable("CustomTextCommands");
-                });
-
-            modelBuilder.Entity("TASagentTwitchBot.Core.Database.Quote", b =>
-                {
-                    b.Property<int>("QuoteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("FakeNewsExplanation")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsFakeNews")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("QuoteText")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Speaker")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("QuoteId");
-
-                    b.HasIndex("CreatorId");
-
-                    b.ToTable("Quotes");
+                    b.ToTable("CustomTextCommands", (string)null);
                 });
 
             modelBuilder.Entity("TASagentTwitchBot.Core.Database.User", b =>
@@ -115,23 +82,7 @@ namespace TASagentTwitchBot.EmoteEffectsDemo.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("TASagentTwitchBot.Core.Database.Quote", b =>
-                {
-                    b.HasOne("TASagentTwitchBot.Core.Database.User", "Creator")
-                        .WithMany("QuotesCreated")
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Creator");
-                });
-
-            modelBuilder.Entity("TASagentTwitchBot.Core.Database.User", b =>
-                {
-                    b.Navigation("QuotesCreated");
+                    b.ToTable("Users", (string)null);
                 });
 #pragma warning restore 612, 618
         }

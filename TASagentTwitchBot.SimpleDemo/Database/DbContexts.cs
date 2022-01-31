@@ -3,9 +3,10 @@
 namespace TASagentTwitchBot.SimpleDemo.Database;
 
 //Create the database 
-public class DatabaseContext : Core.Database.BaseDatabaseContext
+public class DatabaseContext : Core.Database.BaseDatabaseContext, Plugin.Quotes.IQuoteDatabaseContext
 {
     public DbSet<SupplementalData> SupplementalData { get; set; } = null!;
+    public DbSet<Plugin.Quotes.Quote> Quotes { get; set; } = null!;
 
     public async Task<SupplementalData> GetSupplementalDataAsync(Core.Database.User user)
     {
@@ -27,12 +28,6 @@ public class DatabaseContext : Core.Database.BaseDatabaseContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        //Hack to force initialization to our data directory for EF Core Utilities
-        if (!BGC.IO.DataManagement.Initialized)
-        {
-            BGC.IO.DataManagement.Initialize("TASagentBotDemo");
-        }
-
         options.UseSqlite($"Data Source={BGC.IO.DataManagement.PathForDataFile("Config", "data.sqlite")}");
     }
 }

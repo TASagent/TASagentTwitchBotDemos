@@ -98,22 +98,10 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.PubSub.PubSubClient>()
     .AddSingleton<TASagentTwitchBot.Core.PubSub.IRedemptionSystem, TASagentTwitchBot.Core.PubSub.RedemptionSystem>();
 
-//Core Midi System
-builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Audio.MidiKeyboardHandler>();
-
-//Core Emote Effects System
-builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.API.BTTV.BTTVHelper>()
-    .AddSingleton<TASagentTwitchBot.Core.EmoteEffects.EmoteEffectConfiguration>(TASagentTwitchBot.Core.EmoteEffects.EmoteEffectConfiguration.GetConfig())
-    .AddSingleton<TASagentTwitchBot.Core.EmoteEffects.IEmoteEffectListener, TASagentTwitchBot.Core.EmoteEffects.EmoteEffectListener>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.EmoteEffects.EmoteEffectSystem>();
-
-
 //Core Timer System
 builder.Services.AddSingleton<TASagentTwitchBot.Core.Timer.ITimerManager, TASagentTwitchBot.Core.Timer.TimerManager>();
 
-//Core TTTAS System
+//TTTAS System
 builder.Services.RegisterTTTASServices();
 
 
@@ -163,7 +151,7 @@ app.UseStaticFiles();
 //Core Web Assets
 app.UseCoreLibraryContent("TASagentTwitchBot.Core");
 
-//Core TTTAS Assets
+//TTTAS Assets
 app.UseCoreLibraryContent("TASagentTwitchBot.Plugin.TTTAS");
 
 //Authentication Middleware
@@ -176,7 +164,7 @@ app.MapControllers();
 app.MapHub<TASagentTwitchBot.Core.Web.Hubs.MonitorHub>("/Hubs/Monitor");
 
 
-//Core TTTAS Endpoints
+//TTTAS Endpoints
 app.RegisterTTTASEndpoints();
 
 

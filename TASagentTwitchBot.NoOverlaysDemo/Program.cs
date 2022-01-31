@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 using TASagentTwitchBot.Core.Extensions;
 using TASagentTwitchBot.Core.Web;
+using TASagentTwitchBot.Plugin.Quotes.Web;
 
 //Initialize DataManagement
 BGC.IO.DataManagement.Initialize("TASagentBotDemo");
@@ -19,6 +20,9 @@ builder.WebHost
 
 IMvcBuilder mvcBuilder = builder.Services.GetMvcBuilder();
 
+//Register Quotes Assembly for inclusion
+mvcBuilder.AddQuotesAssembly();
+
 //Register Core Controllers (with potential exclusions) 
 mvcBuilder.RegisterControllersWithoutFeatures("Overlay");
 
@@ -32,6 +36,8 @@ builder.Services
 //Register custom database to be served for BaseDatabaseContext
 builder.Services
     .AddScoped<TASagentTwitchBot.Core.Database.BaseDatabaseContext>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Database.DatabaseContext>());
+
+builder.Services.RegisterQuoteDatabase<TASagentTwitchBot.NoOverlaysDemo.Database.DatabaseContext>();
 
 //Core Agnostic Systems
 builder.Services
@@ -100,10 +106,6 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.PubSub.PubSubClient>()
     .AddSingleton<TASagentTwitchBot.Core.PubSub.IRedemptionSystem, TASagentTwitchBot.Core.PubSub.RedemptionSystem>();
 
-//Core Midi System
-builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Audio.MidiKeyboardHandler>();
-
 //Core WebServer Config (Shared by WebTTS and EventSub)
 builder.Services
     .AddSingleton(TASagentTwitchBot.Core.Config.ServerConfig.GetConfig());
@@ -121,14 +123,17 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.EventSub.IEventSubSubscriber, TASagentTwitchBot.Core.EventSub.FollowSubscriber>()
     .AddSingleton<TASagentTwitchBot.Core.EventSub.IEventSubSubscriber, TASagentTwitchBot.Core.EventSub.StreamChangeSubscriber>();
 
+
+//Quote System
+builder.Services.RegisterQuotesServices();
+
 //Command System
 //Core Commands
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Commands.CommandSystem>()
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.CustomCommands>()
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.SystemCommandSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.PermissionSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Quotes.QuoteSystem>();
+    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.PermissionSystem>();
 
 //Core Credit System
 builder.Services
@@ -170,6 +175,9 @@ app.UseStaticFiles();
 
 //Core Web Assets
 app.UseCoreLibraryContent("TASagentTwitchBot.Core");
+
+//Quote Assets
+app.UseCoreLibraryContent("TASagentTwitchBot.Plugin.Quotes");
 
 //Authentication Middleware
 app.UseMiddleware<TASagentTwitchBot.Core.Web.Middleware.AuthCheckerMiddleware>();
@@ -216,7 +224,7 @@ if (!configurationSuccessful)
 //
 // Construct required components and run
 //
-    communication.SendDebugMessage("*** Starting Up No Overlays Demo ***");
+communication.SendDebugMessage("*** Starting Up No Overlays Demo ***");
 
 TASagentTwitchBot.Core.ErrorHandler errorHandler = app.Services.GetRequiredService<TASagentTwitchBot.Core.ErrorHandler>();
 TASagentTwitchBot.Core.ApplicationManagement applicationManagement = app.Services.GetRequiredService<TASagentTwitchBot.Core.ApplicationManagement>();
@@ -228,7 +236,6 @@ app.Services.GetRequiredService<TASagentTwitchBot.Core.Commands.CommandSystem>()
 app.Services.GetRequiredService<TASagentTwitchBot.Core.EventSub.EventSubHandler>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.Bits.CheerDispatcher>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.Audio.IMicrophoneHandler>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.Audio.MidiKeyboardHandler>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.IMessageAccumulator>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.IRC.IrcClient>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.PubSub.PubSubClient>();

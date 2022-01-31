@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TASagentTwitchBot.TTTASDemo.Database;
 
+#nullable disable
+
 namespace TASagentTwitchBot.TTTASDemo.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
@@ -13,8 +15,7 @@ namespace TASagentTwitchBot.TTTASDemo.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.7");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.1");
 
             modelBuilder.Entity("TASagentTwitchBot.Core.Database.CustomTextCommand", b =>
                 {
@@ -23,48 +24,19 @@ namespace TASagentTwitchBot.TTTASDemo.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Command")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Enabled")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Text")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("CustomTextCommandId");
 
                     b.ToTable("CustomTextCommands");
-                });
-
-            modelBuilder.Entity("TASagentTwitchBot.Core.Database.Quote", b =>
-                {
-                    b.Property<int>("QuoteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("FakeNewsExplanation")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsFakeNews")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("QuoteText")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Speaker")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("QuoteId");
-
-                    b.HasIndex("CreatorId");
-
-                    b.ToTable("Quotes");
                 });
 
             modelBuilder.Entity("TASagentTwitchBot.Core.Database.User", b =>
@@ -101,30 +73,16 @@ namespace TASagentTwitchBot.TTTASDemo.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TwitchUserId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TwitchUserName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("TASagentTwitchBot.Core.Database.Quote", b =>
-                {
-                    b.HasOne("TASagentTwitchBot.Core.Database.User", "Creator")
-                        .WithMany("QuotesCreated")
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Creator");
-                });
-
-            modelBuilder.Entity("TASagentTwitchBot.Core.Database.User", b =>
-                {
-                    b.Navigation("QuotesCreated");
                 });
 #pragma warning restore 612, 618
         }

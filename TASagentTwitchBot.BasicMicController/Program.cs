@@ -1,5 +1,6 @@
 using TASagentTwitchBot.Core.Extensions;
 using TASagentTwitchBot.Core.Web;
+using TASagentTwitchBot.Plugin.Audio.Midi;
 
 //Initialize DataManagement
 BGC.IO.DataManagement.Initialize("TASagentBotDemo");
@@ -15,6 +16,9 @@ builder.WebHost
     .UseUrls("http://0.0.0.0:5000");
 
 IMvcBuilder mvcBuilder = builder.Services.GetMvcBuilder();
+
+//Register Midi Assembly for inclusion
+mvcBuilder.AddMidiAssembly();
 
 //Register Core Controllers (with potential exclusions) 
 mvcBuilder.RegisterControllersWithoutFeatures("TTS", "Overlay", "Notifications", "Database");
@@ -52,10 +56,8 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectProvider, TASagentTwitchBot.Core.Audio.Effects.PitchShiftEffectProvider>()
     .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectProvider, TASagentTwitchBot.Core.Audio.Effects.ReverbEffectProvider>();
 
-//Core Midi System
-builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Audio.MidiKeyboardHandler>();
-
+//Midi System
+builder.Services.RegisterMidiServices();
 
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -129,8 +131,9 @@ TASagentTwitchBot.Core.ErrorHandler errorHandler = app.Services.GetRequiredServi
 TASagentTwitchBot.Core.ApplicationManagement applicationManagement = app.Services.GetRequiredService<TASagentTwitchBot.Core.ApplicationManagement>();
 
 app.Services.GetRequiredService<TASagentTwitchBot.Core.Audio.IMicrophoneHandler>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.Audio.MidiKeyboardHandler>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.IMessageAccumulator>();
+
+app.Services.ConstructRequiredMidiServices();
 
 
 //

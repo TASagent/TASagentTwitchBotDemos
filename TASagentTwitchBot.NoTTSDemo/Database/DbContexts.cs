@@ -2,16 +2,12 @@
 
 namespace TASagentTwitchBot.NoTTSDemo.Database;
 
-public class DatabaseContext : Core.Database.BaseDatabaseContext
+public class DatabaseContext : Core.Database.BaseDatabaseContext, Plugin.Quotes.IQuoteDatabaseContext
 {
+    public DbSet<Plugin.Quotes.Quote> Quotes { get; set; } = null!;
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        //Hack to force initialization to our data directory for EF Core Utilities
-        if (!BGC.IO.DataManagement.Initialized)
-        {
-            BGC.IO.DataManagement.Initialize("TASagentBotDemo");
-        }
-
         options.UseSqlite($"Data Source={BGC.IO.DataManagement.PathForDataFile("Config", "data.sqlite")}");
     }
 }
