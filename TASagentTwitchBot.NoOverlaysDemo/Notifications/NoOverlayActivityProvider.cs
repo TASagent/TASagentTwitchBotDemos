@@ -9,6 +9,7 @@ using TASagentTwitchBot.Core.TTS;
 namespace TASagentTwitchBot.NoOverlaysDemo.Notifications;
 
 public class NoOverlayActivityProvider :
+    IActivityHandler,
     ISubscriptionHandler,
     ICheerHandler,
     IRaidHandler,
@@ -53,13 +54,13 @@ public class NoOverlayActivityProvider :
         this.userHelper = userHelper;
     }
 
-    protected virtual Task Execute(AudioOnlyActivityRequest activityRequest)
+    public Task Execute(ActivityRequest activityRequest)
     {
         List<Task> taskList = new List<Task>();
 
-        if (activityRequest.AudioRequest is not null)
+        if (activityRequest is IAudioActivity audioActivity && audioActivity.AudioRequest is not null)
         {
-            taskList.Add(audioPlayer.PlayAudioRequest(activityRequest.AudioRequest));
+            taskList.Add(audioPlayer.PlayAudioRequest(audioActivity.AudioRequest));
         }
 
         return Task.WhenAll(taskList).WithCancellation(generalTokenSource.Token);
@@ -92,7 +93,7 @@ public class NoOverlayActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new AudioOnlyActivityRequest(
-                audioOnlyActivityProvider: this,
+                activityHandler: this,
                 description: $"Sub: {subscriber.TwitchUserName}: {message ?? ""}",
                 audioRequest: await GetSubscriberAudioRequest(subscriber, (message ?? ""), monthCount, tier)),
             approved: approved);
@@ -147,7 +148,7 @@ public class NoOverlayActivityProvider :
                 ttsText: message);
         }
 
-        return JoinRequests(300, soundEffectRequest, ttsRequest);
+        return AudioTools.JoinRequests(300, soundEffectRequest, ttsRequest);
     }
 
     protected virtual string? GetSubscriberNotificationMessage(
@@ -209,7 +210,7 @@ public class NoOverlayActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new AudioOnlyActivityRequest(
-                audioOnlyActivityProvider: this,
+                activityHandler: this,
                 description: $"User {cheerer.TwitchUserName} cheered {quantity} bits: {message}",
                 audioRequest: await GetCheerAudioRequest(cheerer, message, quantity)),
             approved: approved);
@@ -257,7 +258,7 @@ public class NoOverlayActivityProvider :
                 ttsText: message);
         }
 
-        return JoinRequests(300, soundEffectRequest, ttsRequest);
+        return AudioTools.JoinRequests(300, soundEffectRequest, ttsRequest);
     }
 
     #endregion ICheerHandler
@@ -286,7 +287,7 @@ public class NoOverlayActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new AudioOnlyActivityRequest(
-                audioOnlyActivityProvider: this,
+                activityHandler: this,
                 description: $"Raid: {raider} with {count} viewers",
                 audioRequest: await GetRaidAudioRequest(raider, count)),
             approved: approved);
@@ -358,7 +359,7 @@ public class NoOverlayActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new AudioOnlyActivityRequest(
-                audioOnlyActivityProvider: this,
+                activityHandler: this,
                 description: $"Gift Sub To: {recipientId}",
                 audioRequest: await GetGiftSubAudioRequest(sender, recipient, tier, months)),
             approved: approved);
@@ -423,7 +424,7 @@ public class NoOverlayActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new AudioOnlyActivityRequest(
-                audioOnlyActivityProvider: this,
+                activityHandler: this,
                 description: $"Anon Gift Sub To: {recipient}",
                 audioRequest: await GetAnonGiftSubAudioRequest(recipient, tier, months)),
             approved: approved);
@@ -488,7 +489,7 @@ public class NoOverlayActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new AudioOnlyActivityRequest(
-                audioOnlyActivityProvider: this,
+                activityHandler: this,
                 description: $"Follower: {follower.TwitchUserName}",
                 audioRequest: await GetFollowAudioRequest(follower)),
             approved: approved);
@@ -524,6 +525,8 @@ public class NoOverlayActivityProvider :
     #endregion IFollowerHandler
     #region ITTSHandler
 
+    Task<bool> ITTSHandler.SetTTSEnabled(bool enabled) => ttsRenderer.SetTTSEnabled(enabled);
+
     public virtual async void HandleTTS(
         Core.Database.User user,
         string message,
@@ -537,7 +540,7 @@ public class NoOverlayActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new AudioOnlyActivityRequest(
-                audioOnlyActivityProvider: this,
+                activityHandler: this,
                 description: $"TTS {user.TwitchUserName} : {message}",
                 audioRequest: await GetTTSAudioRequest(user, message)),
             approved: approved);
@@ -565,30 +568,6 @@ public class NoOverlayActivityProvider :
 
     #endregion ITTSHandler
 
-    public static AudioRequest? JoinRequests(int delayMS, params AudioRequest?[] audioRequests)
-    {
-#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-        List<AudioRequest> audioRequestList = new List<AudioRequest>(audioRequests?.Where(x => x is not null) ?? Array.Empty<AudioRequest?>());
-#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-
-        if (audioRequestList.Count == 0)
-        {
-            return null;
-        }
-
-        if (audioRequestList.Count == 1)
-        {
-            return audioRequestList[0];
-        }
-
-        for (int i = audioRequestList.Count - 1; i > 0; i--)
-        {
-            audioRequestList.Insert(i, new AudioDelay(delayMS));
-        }
-
-        return new ConcatenatedAudioRequest(audioRequestList);
-    }
-
     protected virtual void Dispose(bool disposing)
     {
         if (!disposedValue)
@@ -610,25 +589,17 @@ public class NoOverlayActivityProvider :
         GC.SuppressFinalize(this);
     }
 
-    public class AudioOnlyActivityRequest : ActivityRequest
+    public class AudioOnlyActivityRequest : ActivityRequest, IAudioActivity
     {
-        private readonly NoOverlayActivityProvider audioOnlyActivityProvider;
         public AudioRequest? AudioRequest { get; }
 
-        private readonly string description;
-
         public AudioOnlyActivityRequest(
-            NoOverlayActivityProvider audioOnlyActivityProvider,
+            IActivityHandler activityHandler,
             string description,
             AudioRequest? audioRequest)
+            : base(activityHandler, description)
         {
-            this.audioOnlyActivityProvider = audioOnlyActivityProvider;
-            this.description = description;
-
             AudioRequest = audioRequest;
         }
-
-        public override Task Execute() => audioOnlyActivityProvider.Execute(this);
-        public override string ToString() => description;
     }
 }

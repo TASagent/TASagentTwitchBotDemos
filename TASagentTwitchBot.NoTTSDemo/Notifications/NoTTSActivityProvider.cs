@@ -8,6 +8,7 @@ using TASagentTwitchBot.Core.Notifications;
 namespace TASagentTwitchBot.NoTTSDemo.Notifications;
 
 public class NoTTSActivityProvider :
+    IActivityHandler,
     ISubscriptionHandler,
     ICheerHandler,
     IRaidHandler,
@@ -54,18 +55,18 @@ public class NoTTSActivityProvider :
         this.userHelper = userHelper;
     }
 
-    protected virtual Task Execute(NoTTSActivityRequest activityRequest)
+    public Task Execute(ActivityRequest activityRequest)
     {
         List<Task> taskList = new List<Task>();
 
-        if (activityRequest.NotificationMessage is not null)
+        if (activityRequest is IOverlayActivity overlayActivity && overlayActivity.NotificationMessage is not null)
         {
-            taskList.Add(notificationServer.ShowNotificationAsync(activityRequest.NotificationMessage));
+            taskList.Add(notificationServer.ShowNotificationAsync(overlayActivity.NotificationMessage));
         }
 
-        if (activityRequest.AudioRequest is not null)
+        if (activityRequest is IAudioActivity audioActivity && audioActivity.AudioRequest is not null)
         {
-            taskList.Add(audioPlayer.PlayAudioRequest(activityRequest.AudioRequest));
+            taskList.Add(audioPlayer.PlayAudioRequest(audioActivity.AudioRequest));
         }
 
         return Task.WhenAll(taskList).WithCancellation(generalTokenSource.Token);
@@ -98,7 +99,7 @@ public class NoTTSActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new NoTTSActivityRequest(
-                fullActivityProvider: this,
+                activityHandler: this,
                 description: $"Sub: {subscriber.TwitchUserName}: {message ?? ""}",
                 notificationMessage: await GetSubscriberNotificationRequest(subscriber, (message ?? ""), monthCount, tier),
                 audioRequest: await GetSubscriberAudioRequest(subscriber, (message ?? ""), monthCount, tier)),
@@ -154,7 +155,7 @@ public class NoTTSActivityProvider :
             }
         }
 
-        return Task.FromResult(JoinRequests(300, soundEffectRequest));
+        return Task.FromResult(AudioTools.JoinRequests(300, soundEffectRequest));
     }
 
     protected virtual Task<MarqueeMessage?> GetSubscriberMarqueeMessage(
@@ -230,7 +231,7 @@ public class NoTTSActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new NoTTSActivityRequest(
-                fullActivityProvider: this,
+                activityHandler: this,
                 description: $"User {cheerer.TwitchUserName} cheered {quantity} bits: {message}",
                 notificationMessage: await GetCheerNotificationRequest(cheerer, message, quantity),
                 audioRequest: await GetCheerAudioRequest(cheerer, message, quantity)),
@@ -292,7 +293,7 @@ public class NoTTSActivityProvider :
             }
         }
 
-        return Task.FromResult(JoinRequests(300, soundEffectRequest));
+        return Task.FromResult(AudioTools.JoinRequests(300, soundEffectRequest));
     }
 
     protected virtual Task<MarqueeMessage?> GetCheerMarqueeMessage(
@@ -334,7 +335,7 @@ public class NoTTSActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new NoTTSActivityRequest(
-                fullActivityProvider: this,
+                activityHandler: this,
                 description: $"Raid: {raider} with {count} viewers",
                 notificationMessage: await GetRaidNotificationRequest(raider, count),
                 audioRequest: await GetRaidAudioRequest(raider, count)),
@@ -424,7 +425,7 @@ public class NoTTSActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new NoTTSActivityRequest(
-                fullActivityProvider: this,
+                activityHandler: this,
                 description: $"Gift Sub To: {recipientId}",
                 notificationMessage: await GetGiftSubNotificationRequest(sender, recipient, tier, months),
                 audioRequest: await GetGiftSubAudioRequest(sender, recipient, tier, months)),
@@ -545,7 +546,7 @@ public class NoTTSActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new NoTTSActivityRequest(
-                fullActivityProvider: this,
+                activityHandler: this,
                 description: $"Anon Gift Sub To: {recipient}",
                 notificationMessage: await GetAnonGiftSubNotificationRequest(recipient, tier, months),
                 audioRequest: await GetAnonGiftSubAudioRequest(recipient, tier, months)),
@@ -663,7 +664,7 @@ public class NoTTSActivityProvider :
 
         activityDispatcher.QueueActivity(
             activity: new NoTTSActivityRequest(
-                fullActivityProvider: this,
+                activityHandler: this,
                 description: $"Follower: {follower.TwitchUserName}",
                 notificationMessage: await GetFollowNotificationRequest(follower),
                 audioRequest: await GetFollowAudioRequest(follower)),
@@ -723,30 +724,6 @@ public class NoTTSActivityProvider :
 
     #endregion IFollowerHandler
 
-    public static AudioRequest? JoinRequests(int delayMS, params AudioRequest?[] audioRequests)
-    {
-#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-        List<AudioRequest> audioRequestList = new List<AudioRequest>(audioRequests?.Where(x => x is not null) ?? Array.Empty<AudioRequest?>());
-#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-
-        if (audioRequestList.Count == 0)
-        {
-            return null;
-        }
-
-        if (audioRequestList.Count == 1)
-        {
-            return audioRequestList[0];
-        }
-
-        for (int i = audioRequestList.Count - 1; i > 0; i--)
-        {
-            audioRequestList.Insert(i, new AudioDelay(delayMS));
-        }
-
-        return new ConcatenatedAudioRequest(audioRequestList);
-    }
-
     protected virtual void Dispose(bool disposing)
     {
         if (!disposedValue)
@@ -768,28 +745,20 @@ public class NoTTSActivityProvider :
         GC.SuppressFinalize(this);
     }
 
-    public class NoTTSActivityRequest : ActivityRequest
+    public class NoTTSActivityRequest : ActivityRequest, IOverlayActivity, IAudioActivity
     {
-        private readonly NoTTSActivityProvider noTTSActivityProvider;
         public Core.Notifications.NotificationMessage? NotificationMessage { get; }
         public AudioRequest? AudioRequest { get; }
 
-        private readonly string description;
-
         public NoTTSActivityRequest(
-            NoTTSActivityProvider fullActivityProvider,
+            IActivityHandler activityHandler,
             string description,
             Core.Notifications.NotificationMessage? notificationMessage = null,
             AudioRequest? audioRequest = null)
+            : base(activityHandler, description)
         {
-            this.noTTSActivityProvider = fullActivityProvider;
-            this.description = description;
-
             NotificationMessage = notificationMessage;
             AudioRequest = audioRequest;
         }
-
-        public override Task Execute() => noTTSActivityProvider.Execute(this);
-        public override string ToString() => description;
     }
 }

@@ -3,7 +3,7 @@ using TASagentTwitchBot.Core.Web;
 using TASagentTwitchBot.Plugin.Audio.Midi;
 
 //Initialize DataManagement
-BGC.IO.DataManagement.Initialize("TASagentBotDemo");
+BGC.IO.DataManagement.Initialize("TASagentBotMicControllerDemo");
 
 //
 // Define and register services

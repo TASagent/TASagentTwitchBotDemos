@@ -67,15 +67,14 @@ builder.Services
 
 //Notification Stubs
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>();
-
-builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ITTSHandler>(x => x.GetRequiredService<TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler>(x => x.GetRequiredService<TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ICheerHandler>(x => x.GetRequiredService<TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IRaidHandler>(x => x.GetRequiredService<TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IGiftSubHandler>(x => x.GetRequiredService<TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IFollowerHandler>(x => x.GetRequiredService<TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>());
+    .AddSingleton<TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IActivityHandler, TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.ITTSHandler, TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler, TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.ICheerHandler, TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IRaidHandler, TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IGiftSubHandler, TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IFollowerHandler, TASagentTwitchBot.Core.Notifications.ActivityProviderStubs>();
 
 //Core Emote Effects System
 builder.Services
@@ -100,8 +99,7 @@ builder.Services
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
-        Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 //

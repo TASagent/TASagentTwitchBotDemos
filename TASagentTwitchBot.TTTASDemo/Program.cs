@@ -6,7 +6,7 @@ using TASagentTwitchBot.Core.Web;
 using TASagentTwitchBot.Plugin.TTTAS.Web;
 
 //Initialize DataManagement
-BGC.IO.DataManagement.Initialize("TASagentBotDemo");
+BGC.IO.DataManagement.Initialize("TASagentBotTTTASDemo");
 
 //
 // Define and register services
@@ -75,6 +75,12 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Notifications.NotificationServer>()
     .AddSingleton<TASagentTwitchBot.Core.Notifications.IActivityDispatcher, TASagentTwitchBot.Core.Notifications.ActivityDispatcher>();
 
+//Custom ActivityHandler
+builder.Services
+    .AddSingleton<TASagentTwitchBot.TTTASDemo.TTTASAudioHandler>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IActivityHandler, TASagentTwitchBot.TTTASDemo.TTTASAudioHandler>();
+
+
 //Core Audio System
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Audio.IAudioPlayer, TASagentTwitchBot.Core.Audio.AudioPlayer>()
@@ -105,11 +111,6 @@ builder.Services.AddSingleton<TASagentTwitchBot.Core.Timer.ITimerManager, TASage
 builder.Services.RegisterTTTASServices();
 
 
-//Override the Text-To-TAS AudioHandler with our custom audio-only version
-builder.Services.UnregisterImplementation<TASagentTwitchBot.Plugin.TTTAS.TTTASFullHandler>();
-builder.Services.AddSingleton<TASagentTwitchBot.Plugin.TTTAS.ITTTASHandler, TASagentTwitchBot.TTTASDemo.TTTASAudioHandler>();
-
-
 //Command System
 //Core Commands
 builder.Services
@@ -124,8 +125,7 @@ builder.Services
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
-        Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 

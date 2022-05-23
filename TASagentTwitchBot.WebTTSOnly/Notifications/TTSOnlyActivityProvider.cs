@@ -7,7 +7,8 @@ using TASagentTwitchBot.Core.Web.Hubs;
 
 namespace TASagentTwitchBot.WebTTSOnly.Notifications;
 
-public class TTSOnlyActivityProvider : 
+public class TTSOnlyActivityProvider :
+    IActivityHandler,
     ITTSHandler,
     IDisposable
 {
@@ -35,26 +36,28 @@ public class TTSOnlyActivityProvider :
         this.ttsMarqueeHubContext = ttsMarqueeHubContext;
     }
 
-    private Task Execute(TTSActivityRequest activityRequest)
+    public Task Execute(ActivityRequest activityRequest)
     {
         List<Task> taskList = new List<Task>();
 
-        if (activityRequest.AudioRequest is not null)
+        if (activityRequest is IAudioActivity audioActivity && audioActivity.AudioRequest is not null)
         {
-            taskList.Add(audioPlayer.PlayAudioRequest(activityRequest.AudioRequest));
+            taskList.Add(audioPlayer.PlayAudioRequest(audioActivity.AudioRequest));
         }
 
-        if (activityRequest.MarqueeMessage is not null)
+        if (activityRequest is IMarqueeMessageActivity marqueeMessageActivity && marqueeMessageActivity.MarqueeMessage is not null)
         {
             //Don't bother waiting on this one to complete
             taskList.Add(ttsMarqueeHubContext.Clients.All.SendAsync("ReceiveTTSNotification",
-                activityRequest.MarqueeMessage.GetMessage()));
+                marqueeMessageActivity.MarqueeMessage.GetMessage()));
         }
 
         return Task.WhenAll(taskList).WithCancellation(generalTokenSource.Token);
     }
 
     #region ITTSHandler
+
+    Task<bool> ITTSHandler.SetTTSEnabled(bool enabled) => ttsRenderer.SetTTSEnabled(enabled);
 
     public virtual async void HandleTTS(
         User user,
@@ -63,7 +66,7 @@ public class TTSOnlyActivityProvider :
     {
         activityDispatcher.QueueActivity(
             activity: new TTSActivityRequest(
-                activityProvider: this,
+                activityHandler: this,
                 description: $"TTS {user.TwitchUserName} : {message}",
                 audioRequest: await GetTTSAudioRequest(user, message),
                 marqueeMessage: new MarqueeMessage(user.TwitchUserName, message, user.Color)),
@@ -84,30 +87,6 @@ public class TTSOnlyActivityProvider :
     }
 
     #endregion ITTSHandler
-
-    public static Core.Audio.AudioRequest? JoinRequests(int delayMS, params Core.Audio.AudioRequest?[] audioRequests)
-    {
-#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-        List<Core.Audio.AudioRequest> audioRequestList = new List<Core.Audio.AudioRequest>(audioRequests?.Where(x => x is not null) ?? Array.Empty<Core.Audio.AudioRequest?>());
-#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-
-        if (audioRequestList.Count == 0)
-        {
-            return null;
-        }
-
-        if (audioRequestList.Count == 1)
-        {
-            return audioRequestList[0];
-        }
-
-        for (int i = audioRequestList.Count - 1; i > 0; i--)
-        {
-            audioRequestList.Insert(i, new Core.Audio.AudioDelay(delayMS));
-        }
-
-        return new Core.Audio.ConcatenatedAudioRequest(audioRequestList);
-    }
 
     protected virtual void Dispose(bool disposing)
     {
@@ -130,28 +109,20 @@ public class TTSOnlyActivityProvider :
         GC.SuppressFinalize(this);
     }
 
-    public class TTSActivityRequest : ActivityRequest
+    public class TTSActivityRequest : ActivityRequest, IAudioActivity, IMarqueeMessageActivity
     {
-        private readonly TTSOnlyActivityProvider activityProvider;
         public Core.Audio.AudioRequest? AudioRequest { get; }
         public MarqueeMessage? MarqueeMessage { get; }
 
-        private readonly string description;
-
         public TTSActivityRequest(
-            TTSOnlyActivityProvider activityProvider,
+            IActivityHandler activityHandler,
             string description,
             Core.Audio.AudioRequest? audioRequest = null,
             MarqueeMessage? marqueeMessage = null)
+            : base(activityHandler, description)
         {
-            this.activityProvider = activityProvider;
-            this.description = description;
-
             AudioRequest = audioRequest;
             MarqueeMessage = marqueeMessage;
         }
-
-        public override Task Execute() => activityProvider.Execute(this);
-        public override string ToString() => description;
     }
 }

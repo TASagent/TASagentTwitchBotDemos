@@ -7,7 +7,7 @@ using TASagentTwitchBot.Plugin.ControllerSpy.Web;
 using TASagentTwitchBot.Plugin.Quotes.Web;
 
 //Initialize DataManagement
-BGC.IO.DataManagement.Initialize("TASagentBotDemo");
+BGC.IO.DataManagement.Initialize("TASagentBotNoTTSDemo");
 
 //
 // Define and register services
@@ -81,11 +81,12 @@ builder.Services
 //Custom Notification
 builder.Services
     .AddSingleton<TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ICheerHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IRaidHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IGiftSubHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IFollowerHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>());
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IActivityHandler, TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler, TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.ICheerHandler, TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IRaidHandler, TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IGiftSubHandler, TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IFollowerHandler, TASagentTwitchBot.NoTTSDemo.Notifications.NoTTSActivityProvider>();
 
 //Core Audio System
 builder.Services

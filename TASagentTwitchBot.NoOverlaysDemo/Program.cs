@@ -6,7 +6,7 @@ using TASagentTwitchBot.Core.Web;
 using TASagentTwitchBot.Plugin.Quotes.Web;
 
 //Initialize DataManagement
-BGC.IO.DataManagement.Initialize("TASagentBotDemo");
+BGC.IO.DataManagement.Initialize("TASagentBotNoOverlaysDemo");
 
 //
 // Define and register services
@@ -76,12 +76,13 @@ builder.Services
 //Custom Notification
 builder.Services
     .AddSingleton<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ICheerHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IRaidHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IGiftSubHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.IFollowerHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>())
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ITTSHandler>(x => x.GetRequiredService<TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>());
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IActivityHandler, TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler, TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.ICheerHandler, TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IRaidHandler, TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IGiftSubHandler, TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IFollowerHandler, TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.ITTSHandler, TASagentTwitchBot.NoOverlaysDemo.Notifications.NoOverlayActivityProvider>();
 
 //Core Audio System
 builder.Services
@@ -143,8 +144,7 @@ builder.Services
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
-        Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 

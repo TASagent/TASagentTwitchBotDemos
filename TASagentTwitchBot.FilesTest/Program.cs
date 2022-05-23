@@ -2,7 +2,7 @@ using TASagentTwitchBot.Core.Extensions;
 using TASagentTwitchBot.Core.Web;
 
 //Initialize DataManagement
-BGC.IO.DataManagement.Initialize("TASagentBotDemo");
+BGC.IO.DataManagement.Initialize("TASagentBotFilesTestDemo");
 
 //
 // Define and register services

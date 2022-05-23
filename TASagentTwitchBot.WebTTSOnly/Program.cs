@@ -79,7 +79,8 @@ builder.Services
 //Custom Notification
 builder.Services
     .AddSingleton<TASagentTwitchBot.WebTTSOnly.Notifications.TTSOnlyActivityProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Notifications.ITTSHandler>(x => x.GetRequiredService<TASagentTwitchBot.WebTTSOnly.Notifications.TTSOnlyActivityProvider>());
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.IActivityHandler, TASagentTwitchBot.WebTTSOnly.Notifications.TTSOnlyActivityProvider>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Notifications.ITTSHandler, TASagentTwitchBot.WebTTSOnly.Notifications.TTSOnlyActivityProvider>();
 
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Notifications.ISubscriptionHandler, TASagentTwitchBot.Core.Notifications.SubscriptionHandlerStub>()
@@ -150,8 +151,7 @@ builder.Services
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
-        Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 //
