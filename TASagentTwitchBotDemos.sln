@@ -35,6 +35,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Plugin.Au
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Plugin.Quotes", "TASagentTwitchBotCore\TASagentTwitchBot.Plugin.Quotes\TASagentTwitchBot.Plugin.Quotes.csproj", "{48BD8EB4-3B35-4B29-86CF-CD759CFC2EA4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TASagentTwitchBot.ScriptTest", "TASagentTwitchBot.ScriptTest\TASagentTwitchBot.ScriptTest.csproj", "{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,10 @@ Global
 		{48BD8EB4-3B35-4B29-86CF-CD759CFC2EA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48BD8EB4-3B35-4B29-86CF-CD759CFC2EA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48BD8EB4-3B35-4B29-86CF-CD759CFC2EA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
