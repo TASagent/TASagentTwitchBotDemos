@@ -26,6 +26,7 @@ public class Program
         RunTest(DepletableTests);
         RunTest(ForEachTests);
         RunTest(ListAssignmentAndNullTests);
+        RunTest(ArrayTests);
         RunTest(RecursionTests);
         RunTest(DictionaryRecursionTests);
         RunTest(DictionaryTests);
@@ -1002,6 +1003,53 @@ public class Program
         return script.ExecuteFunction<List<bool>>("RunTests", context);
     }
 
+
+    static List<bool> ArrayTests()
+    {
+        GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
+
+        string testScript = @"
+            List<bool> RunTests()
+            {
+                List<bool> tests = new List<bool>();
+
+                int[] items = new int[5];
+                items[0] = 1;
+                items[1] = 2;
+                items[2] = 5;
+                items[2] = 3;
+                items[3] = 4;
+                items[4] = 5;
+
+                int[] moreItems = new int[] { 1, 5, 3, 4, 5 };
+                moreItems[1] = 2;
+
+                tests.Add(items[0] == 1);
+                tests.Add(items[1] == 2);
+                tests.Add(items[2] == 3);
+                tests.Add(items[3] == 4);
+                tests.Add(items[4] == 5);
+
+                tests.Add(items[0] == moreItems[0]);
+                tests.Add(items[1] == moreItems[1]);
+                tests.Add(items[2] == moreItems[2]);
+                tests.Add(items[3] == moreItems[3]);
+                tests.Add(items[4] == moreItems[4]);
+
+                int[] moreMoreItems = new int[5] { 1, 2, 3, 4, 5 };
+
+                return tests;
+            }";
+
+        Script script = ScriptParser.LexAndParseScript(testScript,
+            new FunctionSignature(
+                identifier: "RunTests",
+                returnType: typeof(List<bool>)));
+
+        ScriptRuntimeContext context = script.PrepareScript(globalContext);
+        return script.ExecuteFunction<List<bool>>("RunTests", context);
+    }
+
     static List<bool> RecursionTests()
     {
         GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
@@ -1465,6 +1513,8 @@ public class Program
                 testResults.Add(""ABC"" == $""A{ (!temp ? ""C"" : ""B"" )}C"");
                 testResults.Add(""Nested String"" == $""Nes{ $""te{""d S""}t"" }ring"");
                 testResults.Add(""Test String"" == $""{""Test""} String"");
+
+                testResults.Add(""ABCDE"" == $""{""A""}{""B""}{""C""}{""D""}{""E""}"");
 
                 return testResults;
             }";

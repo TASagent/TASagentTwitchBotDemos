@@ -185,11 +185,11 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Credit.BasicCreditCommandSystem>()
     .AddSingleton<TASagentTwitchBot.Core.Credit.ICreditManager, TASagentTwitchBot.Core.Credit.SimpleCreditManager>();
 
-////Custom Point-spender System
-//builder.Services
-//    .AddSingleton<TASagentTwitchBot.SimpleDemo.PointsSpender.IPointSpenderHandler, TASagentTwitchBot.SimpleDemo.PointsSpender.PointSpenderHandler>()
-//    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.SimpleDemo.PointsSpender.PointsSpenderSystem>()
-//    .AddSingleton<TASagentTwitchBot.Core.PubSub.IRedemptionContainer>(x => x.GetRequiredService<TASagentTwitchBot.SimpleDemo.PointsSpender.IPointSpenderHandler>());
+//Custom Point-spender System
+builder.Services
+    .AddSingleton<TASagentTwitchBot.SimpleDemo.PointsSpender.IPointSpenderHandler, TASagentTwitchBot.SimpleDemo.PointsSpender.PointSpenderHandler>()
+    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.SimpleDemo.PointsSpender.PointsSpenderSystem>()
+    .AddSingleton<TASagentTwitchBot.Core.PubSub.IRedemptionContainer>(x => x.GetRequiredService<TASagentTwitchBot.SimpleDemo.PointsSpender.IPointSpenderHandler>());
 
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
