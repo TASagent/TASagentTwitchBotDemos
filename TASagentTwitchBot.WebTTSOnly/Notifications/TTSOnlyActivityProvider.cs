@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System.Web;
+using Microsoft.AspNetCore.SignalR;
 
 using TASagentTwitchBot.Core;
 using TASagentTwitchBot.Core.Database;
@@ -45,11 +46,10 @@ public class TTSOnlyActivityProvider :
             taskList.Add(audioPlayer.PlayAudioRequest(audioActivity.AudioRequest));
         }
 
-        if (activityRequest is IMarqueeMessageActivity marqueeMessageActivity && marqueeMessageActivity.MarqueeMessage is not null)
+        if (activityRequest is IMarqueeMessageActivity marqueeMessageActivity && !string.IsNullOrEmpty(marqueeMessageActivity.MarqueeMessage))
         {
             //Don't bother waiting on this one to complete
-            taskList.Add(ttsMarqueeHubContext.Clients.All.SendAsync("ReceiveTTSNotification",
-                marqueeMessageActivity.MarqueeMessage.GetMessage()));
+            taskList.Add(ttsMarqueeHubContext.Clients.All.SendAsync("ReceiveTTSNotification", marqueeMessageActivity.MarqueeMessage));
         }
 
         return Task.WhenAll(taskList).WithCancellation(generalTokenSource.Token);
@@ -69,7 +69,7 @@ public class TTSOnlyActivityProvider :
                 activityHandler: this,
                 description: $"TTS {user.TwitchUserName} : {message}",
                 audioRequest: await GetTTSAudioRequest(user, message),
-                marqueeMessage: new MarqueeMessage(user.TwitchUserName, message, user.Color)),
+                marqueeMessage: GetStandardMarqueeMessage(user, message)),
             approved: approved);
     }
 
@@ -87,6 +87,16 @@ public class TTSOnlyActivityProvider :
     }
 
     #endregion ITTSHandler
+
+    private string? GetStandardMarqueeMessage(User user, string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return null;
+        }
+
+        return $"<h1><span style=\"color: {(string.IsNullOrWhiteSpace(user.Color) ? "#0000FF" : user.Color)}\" >{HttpUtility.HtmlEncode(user.TwitchUserName)}</span>: {HttpUtility.HtmlEncode(message)}</h1>";
+    }
 
     protected virtual void Dispose(bool disposing)
     {
@@ -112,13 +122,13 @@ public class TTSOnlyActivityProvider :
     public class TTSActivityRequest : ActivityRequest, IAudioActivity, IMarqueeMessageActivity
     {
         public Core.Audio.AudioRequest? AudioRequest { get; }
-        public MarqueeMessage? MarqueeMessage { get; }
+        public string? MarqueeMessage { get; }
 
         public TTSActivityRequest(
             IActivityHandler activityHandler,
             string description,
             Core.Audio.AudioRequest? audioRequest = null,
-            MarqueeMessage? marqueeMessage = null)
+            string? marqueeMessage = null)
             : base(activityHandler, description)
         {
             AudioRequest = audioRequest;

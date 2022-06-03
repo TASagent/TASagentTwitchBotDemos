@@ -158,20 +158,6 @@ public class NoTTSActivityProvider :
         return Task.FromResult(AudioTools.JoinRequests(300, soundEffectRequest));
     }
 
-    protected virtual Task<MarqueeMessage?> GetSubscriberMarqueeMessage(
-        Core.Database.User subscriber,
-        string message,
-        int monthCount,
-        int tier)
-    {
-        if (string.IsNullOrWhiteSpace(message))
-        {
-            return Task.FromResult<MarqueeMessage?>(null);
-        }
-
-        return Task.FromResult<MarqueeMessage?>(new MarqueeMessage(subscriber.TwitchUserName, message, subscriber.Color));
-    }
-
     protected virtual string GetSubscriberNotificationMessage(
         Core.Database.User subscriber,
         string message,
@@ -296,19 +282,6 @@ public class NoTTSActivityProvider :
         return Task.FromResult(AudioTools.JoinRequests(300, soundEffectRequest));
     }
 
-    protected virtual Task<MarqueeMessage?> GetCheerMarqueeMessage(
-        Core.Database.User cheerer,
-        string message,
-        int quantity)
-    {
-        if (string.IsNullOrWhiteSpace(message))
-        {
-            return Task.FromResult<MarqueeMessage?>(null);
-        }
-
-        return Task.FromResult<MarqueeMessage?>(new MarqueeMessage(cheerer.TwitchUserName, message, cheerer.Color));
-    }
-
     #endregion ICheerHandler
     #region IRaidHandler
 
@@ -381,13 +354,6 @@ public class NoTTSActivityProvider :
         }
 
         return Task.FromResult(soundEffectRequest);
-    }
-
-    protected virtual Task<MarqueeMessage?> GetRaidMarqueeMessage(
-        Core.Database.User raider,
-        int count)
-    {
-        return Task.FromResult<MarqueeMessage?>(null);
     }
 
     #endregion IRaidHandler
@@ -477,15 +443,6 @@ public class NoTTSActivityProvider :
         }
 
         return Task.FromResult(soundEffectRequest);
-    }
-
-    protected virtual Task<MarqueeMessage?> GetGiftSubMarqueeMessage(
-        Core.Database.User sender,
-        Core.Database.User recipient,
-        int tier,
-        int months)
-    {
-        return Task.FromResult<MarqueeMessage?>(null);
     }
 
     protected virtual string GetGiftSubNotificationMessage(
@@ -597,14 +554,6 @@ public class NoTTSActivityProvider :
         return Task.FromResult(soundEffectRequest);
     }
 
-    protected virtual Task<MarqueeMessage?> GetAnonGiftSubMarqueeMessage(
-        Core.Database.User recipient,
-        int tier,
-        int months)
-    {
-        return Task.FromResult<MarqueeMessage?>(null);
-    }
-
     protected virtual string GetAnonGiftSubNotificationMessage(
         Core.Database.User recipient,
         int tier,
@@ -704,11 +653,6 @@ public class NoTTSActivityProvider :
         }
 
         return Task.FromResult(soundEffectRequest);
-    }
-
-    protected virtual Task<MarqueeMessage?> GetFollowMarqueeMessage(Core.Database.User follower)
-    {
-        return Task.FromResult<MarqueeMessage?>(null);
     }
 
     protected virtual string GetFollowNotificationMessage(Core.Database.User follower)

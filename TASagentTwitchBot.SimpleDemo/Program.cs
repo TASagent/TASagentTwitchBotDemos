@@ -88,13 +88,11 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Scripting.IScriptManager, TASagentTwitchBot.Core.Scripting.ScriptManager>()
     .AddSingletonRedirect<TASagentTwitchBot.Core.Scripting.IScriptRegistrar, TASagentTwitchBot.Core.Scripting.ScriptManager>();
 
-TASagentTwitchBot.Core.Commands.ScriptedCommands.RegisterRequiredScriptingClasses();
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Commands.ScriptedCommands.ScriptedCommandsConfig>(TASagentTwitchBot.Core.Commands.ScriptedCommands.ScriptedCommandsConfig.GetConfig())
     .AddTASSingleton<TASagentTwitchBot.Core.Commands.ScriptedCommands>();
 
 //Custom Notification
-TASagentTwitchBot.Core.Notifications.ScriptedActivityProvider.RegisterRequiredScriptingClasses();
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Notifications.ScriptedActivityProvider.ScriptedNotificationConfig>(TASagentTwitchBot.Core.Notifications.ScriptedActivityProvider.ScriptedNotificationConfig.GetConfig())
     .AddTASSingleton<TASagentTwitchBot.Core.Notifications.ScriptedActivityProvider>()
@@ -187,11 +185,11 @@ builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Credit.BasicCreditCommandSystem>()
     .AddSingleton<TASagentTwitchBot.Core.Credit.ICreditManager, TASagentTwitchBot.Core.Credit.SimpleCreditManager>();
 
-//Custom Point-spender System
-builder.Services
-    .AddSingleton<TASagentTwitchBot.SimpleDemo.PointsSpender.IPointSpenderHandler, TASagentTwitchBot.SimpleDemo.PointsSpender.PointSpenderHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.SimpleDemo.PointsSpender.PointsSpenderSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.PubSub.IRedemptionContainer>(x => x.GetRequiredService<TASagentTwitchBot.SimpleDemo.PointsSpender.IPointSpenderHandler>());
+////Custom Point-spender System
+//builder.Services
+//    .AddSingleton<TASagentTwitchBot.SimpleDemo.PointsSpender.IPointSpenderHandler, TASagentTwitchBot.SimpleDemo.PointsSpender.PointSpenderHandler>()
+//    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.SimpleDemo.PointsSpender.PointsSpenderSystem>()
+//    .AddSingleton<TASagentTwitchBot.Core.PubSub.IRedemptionContainer>(x => x.GetRequiredService<TASagentTwitchBot.SimpleDemo.PointsSpender.IPointSpenderHandler>());
 
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
