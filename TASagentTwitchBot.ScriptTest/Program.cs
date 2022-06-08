@@ -2,7 +2,6 @@
 using BGC.Scripting;
 using BGC.Scripting.Parsing;
 
-
 namespace TASagentTwitchBot.ScriptTest;
 
 public class Program
@@ -39,6 +38,11 @@ public class Program
         RunTest(TestStringInterpolation);
         RunTest(TestGenerics);
         RunTest(TestBinding);
+        RunTest(TestCasting);
+        RunTest(TestStaticBinding);
+        RunTest(TestEnums);
+        RunTest(TestValues);
+        RunTest(TestFunctionInvocations);
 
         Console.ReadKey();
     }
@@ -274,7 +278,7 @@ public class Program
                 if (double.IsNaN(testValue))
                 {
                     testValue = 3.0*4.0 + 2.0 * 6;
-                    testValue ^= 2;
+                    testValue *= testValue;
 
                     testString = ""New String"";
                 }
@@ -1565,25 +1569,6 @@ public class Program
         return newScript.ExecuteFunction<List<bool>>("TestGenerics", 2_000, scriptContext, Array.Empty<object>());
     }
 
-    class TestGenericClass<T>
-    {
-        [ScriptingAccess]
-        public T Value { get; set; }
-        public TestGenericClass(T value)
-        {
-            Value = value;
-        }
-
-        [ScriptingAccess]
-        public T GetValue() => Value;
-
-        [ScriptingAccess]
-        public void SetValue(T value) => Value = value;
-
-        [ScriptingAccess]
-        public Tx TryThing<Tx>(Tx input) => input;
-    }
-
     static List<bool> TestBinding()
     {
         GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
@@ -1613,7 +1598,247 @@ public class Program
         return newScript.ExecuteFunction<List<bool>>("TestBinding", 2_000, scriptContext, Array.Empty<object>());
     }
 
+    static List<bool> TestStaticBinding()
+    {
+        GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
+
+        ClassRegistrar.TryRegisterClass<TestStaticBindingClass>();
+
+        const string TestStaticBindingScript = @"
+            List<bool> TestStaticBinding()
+            {
+                TestStaticBindingClass testObject = new TestStaticBindingClass();
+                List<bool> tests = new List<bool>();
+
+                //Static property access
+                tests.Add(TestStaticBindingClass.StaticValue == 0);
+                tests.Add(0 == TestStaticBindingClass.StaticValue);
+
+                //Static property operation
+                TestStaticBindingClass.StaticValue++;
+
+                tests.Add(TestStaticBindingClass.StaticValue == 1);
+
+                //Static method call Statement
+                TestStaticBindingClass.IncrementStaticValue();
+
+                tests.Add(TestStaticBindingClass.StaticValue == 2);
+
+                //Static method call Expression
+                tests.Add(TestStaticBindingClass.CheckStaticValue(2));
+
+                tests.Add(testObject.InstanceValue == 0);
+                tests.Add(0 == testObject.InstanceValue);
+
+
+                //Nested calls and access
+                tests.Add(TestStaticBindingClass.List.Count == 1);
+                TestStaticBindingClass.List.Clear();
+                tests.Add(TestStaticBindingClass.List.Count == 0);
+                TestStaticBindingClass.List.Add(4);
+                tests.Add(TestStaticBindingClass.List[0] == 4);
+                
+
+                testObject.InstanceValue++;
+
+                tests.Add(testObject.InstanceValue == 1);
+
+                testObject.IncrementInstanceValue();
+
+                tests.Add(testObject.InstanceValue == 2);
+                tests.Add(testObject.CheckInstanceValue(2));
+
+                return tests;
+            }";
+
+        Script newScript = ScriptParser.LexAndParseScript(
+            script: TestStaticBindingScript,
+            new FunctionSignature("TestStaticBinding", typeof(List<bool>), Array.Empty<VariableData>()));
+
+        ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
+
+        return newScript.ExecuteFunction<List<bool>>("TestStaticBinding", 2_000, scriptContext, Array.Empty<object>());
+    }
+
+    static List<bool> TestCasting()
+    {
+        GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
+
+        ClassRegistrar.TryRegisterClass<ITestInterface>();
+        ClassRegistrar.TryRegisterClass<TestInterface1>();
+        ClassRegistrar.TryRegisterClass<TestInterface2>();
+        ClassRegistrar.TryRegisterClass<TestInterfaceUnrelatedClass>();
+
+        const string TestCastingScript = @"
+            List<bool> TestCasting()
+            {
+                List<bool> tests = new List<bool>();
+
+                double doubleValue = 2.5;
+                int intValue = (int)2.5;
+
+                tests.Add(doubleValue != intValue);
+                tests.Add(intValue == 2);
+                tests.Add((int)2.5 == 2);
+
+                TestInterface1 testInterface1 = new TestInterface1();
+                TestInterface2 testInterface2 = new TestInterface2();
+                ITestInterface testInterface = testInterface1;
+                testInterface1 = (TestInterface1)testInterface;
+
+                tests.Add(testInterface1.GetTestValue() == 1);
+                tests.Add(testInterface.GetTestValue() == 1);
+
+                tests.Add(((ITestInterface)testInterface2).GetTestValue() == 2);
+
+                //In C# this should fail. Should we consider making that happen?
+                tests.Add(testInterface2.GetTestValue() == 2);
+
+                ITestInterface testBadCast = (ITestInterface)new TestInterfaceUnrelatedClass();
+
+                tests.Add(testBadCast == null);
+
+                return tests;
+            }";
+
+        Script newScript = ScriptParser.LexAndParseScript(
+            script: TestCastingScript,
+            new FunctionSignature("TestCasting", typeof(List<bool>), Array.Empty<VariableData>()));
+
+        ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
+
+        return newScript.ExecuteFunction<List<bool>>("TestCasting", 2_000, scriptContext, Array.Empty<object>());
+    }
+
+    static List<bool> TestEnums()
+    {
+        GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
+
+        ClassRegistrar.TryRegisterClass<BGC.Audio.AudioChannel>();
+        ClassRegistrar.TryRegisterClass(typeof(Console));
+
+
+        const string TestEnumsScript = @"
+            List<bool> TestEnums()
+            {
+                List<bool> tests = new List<bool>();
+
+                AudioChannel left = AudioChannel.Left;
+                AudioChannel right = AudioChannel.Right;
+
+                tests.Add(left == AudioChannel.Left);
+                tests.Add(left != AudioChannel.Right);
+                tests.Add(right == AudioChannel.Right);
+                tests.Add(AudioChannel.Left < AudioChannel.Both);
+
+                return tests;
+            }";
+
+        Script newScript = ScriptParser.LexAndParseScript(
+            script: TestEnumsScript,
+            new FunctionSignature("TestEnums", typeof(List<bool>), Array.Empty<VariableData>()));
+
+        ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
+
+        return newScript.ExecuteFunction<List<bool>>("TestEnums", 2_000, scriptContext, Array.Empty<object>());
+    }
+
+    static List<bool> TestValues()
+    {
+        GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
+
+        const string TestValuesScript = @"
+            List<bool> TestValues()
+            {
+                List<bool> tests = new List<bool>();
+
+                byte binaryByteTwo = 0b0000_0010;
+                byte decimalByteTwo = 2;
+                byte hexByteTwo = 0x02;
+                tests.Add(binaryByteTwo == decimalByteTwo);
+                tests.Add(hexByteTwo == decimalByteTwo);
+
+                int intTwo = 2;
+                tests.Add(intTwo == decimalByteTwo);
+                tests.Add(intTwo == binaryByteTwo);
+                tests.Add(intTwo == (1 << 1));
+
+
+                return tests;
+            }";
+
+        Script newScript = ScriptParser.LexAndParseScript(
+            script: TestValuesScript,
+            new FunctionSignature("TestValues", typeof(List<bool>), Array.Empty<VariableData>()));
+
+        ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
+
+        return newScript.ExecuteFunction<List<bool>>("TestValues", 2_000, scriptContext, Array.Empty<object>());
+    }
+
+    static List<bool> TestFunctionInvocations()
+    {
+        GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
+
+        const string TestFunctionInvocationsScript = @"
+            List<bool> TestFunctionInvocations()
+            {
+                List<bool> tests = new List<bool>();
+
+                tests.Add(TestFunction(1) == 1);
+                tests.Add(TestFunction(1.0) == 2);
+                tests.Add(TestArgMatching(1) == 3);
+
+                tests.Add(TestMultiArgMatching(1.0, 1) == 4);
+                tests.Add(TestMultiArgMatching(1.0, 1.0) == 5);
+                tests.Add(TestMultiArgMatching(1, 1) == 6);
+
+                tests.Add(TestMultiArgMatching(1.0, (int)1.0) == 4);
+                tests.Add(TestMultiArgMatching(1.0, 1f) == 5);
+                tests.Add(TestMultiArgMatching(1, 1f) == 5);
+
+                return tests;
+            }
+
+            int TestFunction(int value) => 1;
+            int TestFunction(double value) => 2;
+            int TestArgMatching(double value) => 3;
+
+            int TestMultiArgMatching(double value, int value2) => 4;
+            int TestMultiArgMatching(double value, double value2) => 5;
+            int TestMultiArgMatching(int value, int value2) => 6;
+            ";
+
+        Script newScript = ScriptParser.LexAndParseScript(
+            script: TestFunctionInvocationsScript,
+            new FunctionSignature("TestFunctionInvocations", typeof(List<bool>), Array.Empty<VariableData>()));
+
+        ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
+
+        return newScript.ExecuteFunction<List<bool>>("TestFunctionInvocations", 2_000, scriptContext, Array.Empty<object>());
+    }
+
+    #region TestClasses
 #pragma warning disable CA1822 // Mark members as static
+    class TestGenericClass<T>
+    {
+        [ScriptingAccess]
+        public T Value { get; set; }
+        public TestGenericClass(T value)
+        {
+            Value = value;
+        }
+
+        [ScriptingAccess]
+        public T GetValue() => Value;
+
+        [ScriptingAccess]
+        public void SetValue(T value) => Value = value;
+
+        [ScriptingAccess]
+        public Tx TryThing<Tx>(Tx input) => input;
+    }
+
     class TestMethodOverloadingClass
     {
         [ScriptingAccess]
@@ -1625,5 +1850,44 @@ public class Program
         [ScriptingAccess]
         public int DoThing<T>(int _, T x) => 3;
     }
+
+    class TestStaticBindingClass
+    {
+        public static List<int> List { get; } = new List<int>() { 1 };
+
+        public static int StaticValue = 0;
+        public static void IncrementStaticValue() => StaticValue++;
+        public static int GetStaticValue() => StaticValue;
+        public static bool CheckStaticValue(int value) => value == StaticValue;
+
+
+        public int InstanceValue = 0;
+        public void IncrementInstanceValue() => InstanceValue++;
+        public int GetInstanceValue() => InstanceValue;
+        public bool CheckInstanceValue(int value) => value == InstanceValue;
+    }
+
+    interface ITestInterface
+    {
+        int GetTestValue();
+    }
+
+    class TestInterface1 : ITestInterface
+    {
+        public int GetTestValue() => 1;
+    }
+
+    class TestInterface2 : ITestInterface
+    {
+        int ITestInterface.GetTestValue() => 2;
+    }
+
+    class TestInterfaceUnrelatedClass
+    {
+        public int GetTestValue() => 3;
+    }
+
+
 #pragma warning restore CA1822 // Mark members as static
+    #endregion TestClasses
 }
