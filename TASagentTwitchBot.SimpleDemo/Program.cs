@@ -86,7 +86,9 @@ builder.Services
 //Core Scripting
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Scripting.IScriptManager, TASagentTwitchBot.Core.Scripting.ScriptManager>()
-    .AddSingletonRedirect<TASagentTwitchBot.Core.Scripting.IScriptRegistrar, TASagentTwitchBot.Core.Scripting.ScriptManager>();
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Scripting.IScriptRegistrar, TASagentTwitchBot.Core.Scripting.ScriptManager>()
+    .AddSingleton<TASagentTwitchBot.Core.Scripting.IScriptHelper, TASagentTwitchBot.Core.Scripting.ScriptHelper>()
+    .AddSingleton<TASagentTwitchBot.Core.Scripting.IPersistentDataManager, TASagentTwitchBot.Core.Scripting.PersistentDataManager>();
 
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.Commands.ScriptedCommands.ScriptedCommandsConfig>(TASagentTwitchBot.Core.Commands.ScriptedCommands.ScriptedCommandsConfig.GetConfig())
@@ -278,8 +280,6 @@ using (IServiceScope serviceScope = app.Services.GetService<IServiceScopeFactory
 //
 // Construct and run Configurator
 //
-
-
 TASagentTwitchBot.Core.ICommunication communication = app.Services.GetRequiredService<TASagentTwitchBot.Core.ICommunication>();
 TASagentTwitchBot.Core.IConfigurator configurator = app.Services.GetRequiredService<TASagentTwitchBot.Core.IConfigurator>();
 
