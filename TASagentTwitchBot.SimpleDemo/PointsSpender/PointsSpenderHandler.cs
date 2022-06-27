@@ -10,6 +10,7 @@ using TASagentTwitchBot.SimpleDemo.Database;
 
 namespace TASagentTwitchBot.SimpleDemo.PointsSpender;
 
+[Core.AutoRegister]
 public interface IPointSpenderHandler : IRedemptionContainer
 {
     Task PrintLeaderboard();

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.HttpOverrides;
+
 using TASagentTwitchBot.Core.Extensions;
 using TASagentTwitchBot.Core.Web;
 using TASagentTwitchBot.Plugin.Audio.Midi;
@@ -28,33 +30,34 @@ builder.Services.AddSignalR();
 
 //Core Agnostic Systems
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Config.BotConfiguration>(TASagentTwitchBot.Core.Config.BotConfiguration.GetConfig())
-    .AddSingleton<TASagentTwitchBot.Core.ICommunication, TASagentTwitchBot.Core.CommunicationHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.View.IConsoleOutput, TASagentTwitchBot.Core.View.BasicView>()
-    .AddSingleton<TASagentTwitchBot.Core.ErrorHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.ApplicationManagement>()
-    .AddSingleton<TASagentTwitchBot.Core.IMessageAccumulator, TASagentTwitchBot.Core.MessageAccumulator>();
+    .AddTASSingleton(TASagentTwitchBot.Core.Config.BotConfiguration.GetConfig())
+    .AddTASSingleton<TASagentTwitchBot.Core.CommunicationHandler>()
+    .AddTASSingleton<TASagentTwitchBot.Core.View.BasicView>()
+    .AddTASSingleton<TASagentTwitchBot.Core.ErrorHandler>()
+    .AddTASSingleton<TASagentTwitchBot.Core.ApplicationManagement>()
+    .AddTASSingleton<TASagentTwitchBot.Core.MessageAccumulator>();
 
 //Custom Configurator
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.IConfigurator, TASagentTwitchBot.BasicMicController.AudioConfigurator>();
+    .AddTASSingleton<TASagentTwitchBot.BasicMicController.AudioConfigurator>();
 
 //Core Audio System
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Audio.IAudioPlayer, TASagentTwitchBot.Core.Audio.AudioPlayer>()
-    .AddSingleton<TASagentTwitchBot.Core.Audio.IMicrophoneHandler, TASagentTwitchBot.Core.Audio.MicrophoneHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.Audio.ISoundEffectSystem, TASagentTwitchBot.Core.Audio.SoundEffectSystem>();
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.NAudioDeviceManager>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.NAudioPlayer>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.NAudioMicrophoneHandler>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.SoundEffectSystem>();
 
 //Core Audio Effects System
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectSystem, TASagentTwitchBot.Core.Audio.Effects.AudioEffectSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectProvider, TASagentTwitchBot.Core.Audio.Effects.ChorusEffectProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectProvider, TASagentTwitchBot.Core.Audio.Effects.EchoEffectProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectProvider, TASagentTwitchBot.Core.Audio.Effects.FrequencyModulationEffectProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectProvider, TASagentTwitchBot.Core.Audio.Effects.FrequencyShiftEffectProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectProvider, TASagentTwitchBot.Core.Audio.Effects.NoiseVocoderEffectProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectProvider, TASagentTwitchBot.Core.Audio.Effects.PitchShiftEffectProvider>()
-    .AddSingleton<TASagentTwitchBot.Core.Audio.Effects.IAudioEffectProvider, TASagentTwitchBot.Core.Audio.Effects.ReverbEffectProvider>();
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.AudioEffectSystem>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.ChorusEffectProvider>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.EchoEffectProvider>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.FrequencyModulationEffectProvider>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.FrequencyShiftEffectProvider>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.NoiseVocoderEffectProvider>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.PitchShiftEffectProvider>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.ReverbEffectProvider>();
 
 //Midi System
 builder.Services.RegisterMidiServices();
@@ -62,10 +65,8 @@ builder.Services.RegisterMidiServices();
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
-        Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
-
 
 //
 // Finished defining services
@@ -130,10 +131,10 @@ communication.SendDebugMessage("*** Starting Up Basic Mic Application ***");
 TASagentTwitchBot.Core.ErrorHandler errorHandler = app.Services.GetRequiredService<TASagentTwitchBot.Core.ErrorHandler>();
 TASagentTwitchBot.Core.ApplicationManagement applicationManagement = app.Services.GetRequiredService<TASagentTwitchBot.Core.ApplicationManagement>();
 
-app.Services.GetRequiredService<TASagentTwitchBot.Core.Audio.IMicrophoneHandler>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.IMessageAccumulator>();
-
-app.Services.ConstructRequiredMidiServices();
+foreach (TASagentTwitchBot.Core.IStartupListener startupListener in app.Services.GetServices<TASagentTwitchBot.Core.IStartupListener>())
+{
+    startupListener.NotifyStartup();
+}
 
 
 //

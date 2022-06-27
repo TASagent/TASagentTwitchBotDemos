@@ -1,9 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Channels;
-using System.Threading.Tasks;
-
-using TASagentTwitchBot.Core;
+﻿using TASagentTwitchBot.Core;
 
 namespace TASagentTwitchBot.TTTASDemo.View;
 

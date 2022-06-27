@@ -1,12 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace TASagentTwitchBot.TTTASDemo.Chat;
-
-public interface IChatMessageHandler
-{
-    void HandleChatMessage(Core.IRC.IRCMessage message);
-}
+﻿namespace TASagentTwitchBot.TTTASDemo.Chat;
 
 /// <summary>
 /// ChatMessageHandler that omits the Bits notificaiton call

@@ -101,6 +101,7 @@ public class NoTTSActivityProvider :
             activity: new NoTTSActivityRequest(
                 activityHandler: this,
                 description: $"Sub: {subscriber.TwitchUserName}: {message ?? ""}",
+                requesterId: subscriber.TwitchUserId,
                 notificationMessage: await GetSubscriberNotificationRequest(subscriber, (message ?? ""), monthCount, tier),
                 audioRequest: await GetSubscriberAudioRequest(subscriber, (message ?? ""), monthCount, tier)),
             approved: approved);
@@ -219,6 +220,7 @@ public class NoTTSActivityProvider :
             activity: new NoTTSActivityRequest(
                 activityHandler: this,
                 description: $"User {cheerer.TwitchUserName} cheered {quantity} bits: {message}",
+                requesterId: cheerer.TwitchUserId,
                 notificationMessage: await GetCheerNotificationRequest(cheerer, message, quantity),
                 audioRequest: await GetCheerAudioRequest(cheerer, message, quantity)),
             approved: approved);
@@ -310,6 +312,7 @@ public class NoTTSActivityProvider :
             activity: new NoTTSActivityRequest(
                 activityHandler: this,
                 description: $"Raid: {raider} with {count} viewers",
+                requesterId: raider.TwitchUserId,
                 notificationMessage: await GetRaidNotificationRequest(raider, count),
                 audioRequest: await GetRaidAudioRequest(raider, count)),
             approved: approved);
@@ -393,6 +396,7 @@ public class NoTTSActivityProvider :
             activity: new NoTTSActivityRequest(
                 activityHandler: this,
                 description: $"Gift Sub To: {recipientId}",
+                requesterId: sender.TwitchUserId,
                 notificationMessage: await GetGiftSubNotificationRequest(sender, recipient, tier, months),
                 audioRequest: await GetGiftSubAudioRequest(sender, recipient, tier, months)),
             approved: approved);
@@ -505,6 +509,7 @@ public class NoTTSActivityProvider :
             activity: new NoTTSActivityRequest(
                 activityHandler: this,
                 description: $"Anon Gift Sub To: {recipient}",
+                requesterId: "",
                 notificationMessage: await GetAnonGiftSubNotificationRequest(recipient, tier, months),
                 audioRequest: await GetAnonGiftSubAudioRequest(recipient, tier, months)),
             approved: approved);
@@ -615,6 +620,7 @@ public class NoTTSActivityProvider :
             activity: new NoTTSActivityRequest(
                 activityHandler: this,
                 description: $"Follower: {follower.TwitchUserName}",
+                requesterId: follower.TwitchUserId,
                 notificationMessage: await GetFollowNotificationRequest(follower),
                 audioRequest: await GetFollowAudioRequest(follower)),
             approved: approved);
@@ -697,9 +703,10 @@ public class NoTTSActivityProvider :
         public NoTTSActivityRequest(
             IActivityHandler activityHandler,
             string description,
+            string requesterId,
             Core.Notifications.NotificationMessage? notificationMessage = null,
             AudioRequest? audioRequest = null)
-            : base(activityHandler, description)
+            : base(activityHandler, description, requesterId)
         {
             NotificationMessage = notificationMessage;
             AudioRequest = audioRequest;

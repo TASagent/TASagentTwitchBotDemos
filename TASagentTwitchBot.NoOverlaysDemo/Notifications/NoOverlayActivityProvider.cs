@@ -95,6 +95,7 @@ public class NoOverlayActivityProvider :
             activity: new AudioOnlyActivityRequest(
                 activityHandler: this,
                 description: $"Sub: {subscriber.TwitchUserName}: {message ?? ""}",
+                requesterId: subscriber.TwitchUserId,
                 audioRequest: await GetSubscriberAudioRequest(subscriber, (message ?? ""), monthCount, tier)),
             approved: approved);
     }
@@ -212,6 +213,7 @@ public class NoOverlayActivityProvider :
             activity: new AudioOnlyActivityRequest(
                 activityHandler: this,
                 description: $"User {cheerer.TwitchUserName} cheered {quantity} bits: {message}",
+                requesterId: cheerer.TwitchUserId,
                 audioRequest: await GetCheerAudioRequest(cheerer, message, quantity)),
             approved: approved);
     }
@@ -289,6 +291,7 @@ public class NoOverlayActivityProvider :
             activity: new AudioOnlyActivityRequest(
                 activityHandler: this,
                 description: $"Raid: {raider} with {count} viewers",
+                requesterId: raider.TwitchUserId,
                 audioRequest: await GetRaidAudioRequest(raider, count)),
             approved: approved);
     }
@@ -361,6 +364,7 @@ public class NoOverlayActivityProvider :
             activity: new AudioOnlyActivityRequest(
                 activityHandler: this,
                 description: $"Gift Sub To: {recipientId}",
+                requesterId: sender.TwitchUserId,
                 audioRequest: await GetGiftSubAudioRequest(sender, recipient, tier, months)),
             approved: approved);
     }
@@ -426,6 +430,7 @@ public class NoOverlayActivityProvider :
             activity: new AudioOnlyActivityRequest(
                 activityHandler: this,
                 description: $"Anon Gift Sub To: {recipient}",
+                requesterId: "",
                 audioRequest: await GetAnonGiftSubAudioRequest(recipient, tier, months)),
             approved: approved);
     }
@@ -491,6 +496,7 @@ public class NoOverlayActivityProvider :
             activity: new AudioOnlyActivityRequest(
                 activityHandler: this,
                 description: $"Follower: {follower.TwitchUserName}",
+                requesterId: follower.TwitchUserId,
                 audioRequest: await GetFollowAudioRequest(follower)),
             approved: approved);
     }
@@ -542,6 +548,7 @@ public class NoOverlayActivityProvider :
             activity: new AudioOnlyActivityRequest(
                 activityHandler: this,
                 description: $"TTS {user.TwitchUserName} : {message}",
+                requesterId: user.TwitchUserId,
                 audioRequest: await GetTTSAudioRequest(user, message)),
             approved: approved);
     }
@@ -596,8 +603,9 @@ public class NoOverlayActivityProvider :
         public AudioOnlyActivityRequest(
             IActivityHandler activityHandler,
             string description,
+            string requesterId,
             AudioRequest? audioRequest)
-            : base(activityHandler, description)
+            : base(activityHandler, description, requesterId)
         {
             AudioRequest = audioRequest;
         }

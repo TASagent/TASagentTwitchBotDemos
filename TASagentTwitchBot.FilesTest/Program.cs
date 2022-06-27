@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.HttpOverrides;
+
 using TASagentTwitchBot.Core.Extensions;
 using TASagentTwitchBot.Core.Web;
 
@@ -24,18 +26,17 @@ builder.Services.AddSignalR();
 
 //Core Agnostic Systems
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Config.BotConfiguration>(TASagentTwitchBot.Core.Config.BotConfiguration.GetConfig())
-    .AddSingleton<TASagentTwitchBot.Core.ICommunication, TASagentTwitchBot.Core.CommunicationHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.View.IConsoleOutput, TASagentTwitchBot.Core.View.BasicView>()
-    .AddSingleton<TASagentTwitchBot.Core.ErrorHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.ApplicationManagement>()
-    .AddSingleton<TASagentTwitchBot.Core.IMessageAccumulator, TASagentTwitchBot.Core.MessageAccumulator>();
+    .AddTASSingleton(TASagentTwitchBot.Core.Config.BotConfiguration.GetConfig())
+    .AddTASSingleton<TASagentTwitchBot.Core.CommunicationHandler>()
+    .AddTASSingleton<TASagentTwitchBot.Core.View.BasicView>()
+    .AddTASSingleton<TASagentTwitchBot.Core.ErrorHandler>()
+    .AddTASSingleton<TASagentTwitchBot.Core.ApplicationManagement>()
+    .AddTASSingleton<TASagentTwitchBot.Core.MessageAccumulator>();
 
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
-        Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 //
@@ -77,14 +78,19 @@ await app.StartAsync();
 //
 
 TASagentTwitchBot.Core.ICommunication communication = app.Services.GetRequiredService<TASagentTwitchBot.Core.ICommunication>();
+
+app.Services.GetRequiredService<TASagentTwitchBot.Core.View.IConsoleOutput>();
+
 TASagentTwitchBot.Core.ErrorHandler errorHandler = app.Services.GetRequiredService<TASagentTwitchBot.Core.ErrorHandler>();
 TASagentTwitchBot.Core.ApplicationManagement applicationManagement = app.Services.GetRequiredService<TASagentTwitchBot.Core.ApplicationManagement>();
 
-app.Services.GetRequiredService<TASagentTwitchBot.Core.View.IConsoleOutput>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.IMessageAccumulator>();
-
 communication.SendDebugMessage("*** Starting Files Test Application ***");
 communication.SendDebugMessage("Now check out http://localhost:5000/");
+
+foreach (TASagentTwitchBot.Core.IStartupListener startupListener in app.Services.GetServices<TASagentTwitchBot.Core.IStartupListener>())
+{
+    startupListener.NotifyStartup();
+}
 
 //
 // Wait for signal to end application

@@ -68,6 +68,7 @@ public class TTSOnlyActivityProvider :
             activity: new TTSActivityRequest(
                 activityHandler: this,
                 description: $"TTS {user.TwitchUserName} : {message}",
+                requesterId: user.TwitchUserId,
                 audioRequest: await GetTTSAudioRequest(user, message),
                 marqueeMessage: GetStandardMarqueeMessage(user, message)),
             approved: approved);
@@ -127,9 +128,10 @@ public class TTSOnlyActivityProvider :
         public TTSActivityRequest(
             IActivityHandler activityHandler,
             string description,
+            string requesterId,
             Core.Audio.AudioRequest? audioRequest = null,
             string? marqueeMessage = null)
-            : base(activityHandler, description)
+            : base(activityHandler, description, requesterId)
         {
             AudioRequest = audioRequest;
             MarqueeMessage = marqueeMessage;
