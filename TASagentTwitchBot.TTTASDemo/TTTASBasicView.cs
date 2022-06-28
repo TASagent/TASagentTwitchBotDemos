@@ -25,7 +25,8 @@ public class TTTASBasicView : Core.View.BasicView
         communication.SendDebugMessage("Press S to Start or Restart recording current TTTAS prompt.");
         communication.SendDebugMessage("Press D to End recording and submit current TTTAS prompt.");
         communication.SendDebugMessage("Press F to Hide TTTAS prompts.");
-        communication.SendDebugMessage("Press Q to End and Skip the active TTTAS playback.\n");
+        communication.SendDebugMessage("Press Q to End and Skip the active TTTAS playback.");
+        communication.SendDebugMessage("Press X to Entirely cancel the current prompt.\n");
     }
 
     protected override void SendPublicChatHandler(string message) { }
@@ -59,6 +60,11 @@ public class TTTASBasicView : Core.View.BasicView
             case ConsoleKey.Q:
                 //Skip
                 activityDispatcher.Skip();
+                break;
+
+            case ConsoleKey.X:
+                //Cancel
+                tttasProvider.CancelCurrentPrompt();
                 break;
         }
     }

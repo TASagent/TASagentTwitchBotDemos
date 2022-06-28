@@ -35,7 +35,7 @@ builder.Services
 
 //Core Agnostic Systems
 builder.Services
-    .AddTASSingleton(TASagentTwitchBot.Core.Config.BotConfiguration.GetConfig())
+    .AddTASSingleton(TASagentTwitchBot.Core.Config.BotConfiguration.GetConfig(GetDefaultBotConfig()))
     .AddTASSingleton<TASagentTwitchBot.Core.CommunicationHandler>()
     .AddTASSingleton<TASagentTwitchBot.Core.View.BasicView>()
     .AddTASSingleton<TASagentTwitchBot.Core.ErrorHandler>()
@@ -205,3 +205,16 @@ catch (Exception ex)
 //
 
 await app.StopAsync();
+
+
+TASagentTwitchBot.Core.Config.BotConfiguration GetDefaultBotConfig() =>
+    new TASagentTwitchBot.Core.Config.BotConfiguration()
+    {
+        Version = TASagentTwitchBot.Core.Config.BotConfiguration.CURRENT_VERSION,
+        MicConfiguration = new TASagentTwitchBot.Core.Config.MicConfiguration() { Enabled = false },
+        CommandConfiguration = new TASagentTwitchBot.Core.Config.CommandConfiguration
+        {
+            GlobalErrorHandlingEnabled = false,
+            HelpEnabled = false
+        }
+    };

@@ -87,11 +87,6 @@ public class TTTASConfigurator : Core.StandardConfigurator
 
             if (string.IsNullOrEmpty(botConfig.VoiceOutputDevice))
             {
-                botConfig.CommandConfiguration.GlobalErrorHandlingEnabled = false;
-                botConfig.CommandConfiguration.HelpEnabled = false;
-                botConfig.CommandConfiguration.ScopedEnabled = false;
-
-                botConfig.MicConfiguration.Enabled = false;
                 botConfig.VoiceOutputDevice = devices[0];
                 botConfig.Serialize();
             }

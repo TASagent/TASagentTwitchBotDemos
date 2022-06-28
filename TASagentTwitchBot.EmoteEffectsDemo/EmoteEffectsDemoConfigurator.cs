@@ -33,17 +33,6 @@ public class EmoteEffectsDemoConfigurator : Core.StandardConfigurator
 
         successful |= ConfigurePasswords();
 
-        if (string.IsNullOrEmpty(botConfig.VoiceOutputDevice))
-        {
-            //Initial Setup
-            botConfig.CommandConfiguration.GlobalErrorHandlingEnabled = false;
-            botConfig.CommandConfiguration.HelpEnabled = false;
-            botConfig.CommandConfiguration.ScopedEnabled = true;
-
-            botConfig.MicConfiguration.Enabled = false;
-            botConfig.Serialize();
-        }
-
         return successful;
     }
 }
