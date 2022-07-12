@@ -73,6 +73,7 @@ builder.Services
 //Notification System
 //Core Notifications
 builder.Services
+    .AddTASSingleton<TASagentTwitchBot.Core.Notifications.NotificationImageHelper>()
     .AddTASSingleton<TASagentTwitchBot.Core.Notifications.NotificationServer>()
     .AddTASSingleton<TASagentTwitchBot.Core.Commands.NotificationSystem>()
     .AddTASSingleton<TASagentTwitchBot.Core.Notifications.ActivityDispatcher>();
