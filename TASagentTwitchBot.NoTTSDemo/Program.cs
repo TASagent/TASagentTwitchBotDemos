@@ -164,6 +164,9 @@ app.UseRouting();
 app.UseAuthorization();
 app.UseDefaultFiles();
 
+//Config Directory Web Assets - overriding all content
+app.UseDocumentsOverrideContent();
+
 //Custom Web Assets
 app.UseStaticFiles();
 

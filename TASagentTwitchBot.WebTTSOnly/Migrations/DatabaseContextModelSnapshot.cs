@@ -15,7 +15,7 @@ namespace TASagentTwitchBot.WebTTSOnly.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.1");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.6");
 
             modelBuilder.Entity("TASagentTwitchBot.Core.Database.CustomTextCommand", b =>
                 {
@@ -36,7 +36,7 @@ namespace TASagentTwitchBot.WebTTSOnly.Migrations
 
                     b.HasKey("CustomTextCommandId");
 
-                    b.ToTable("CustomTextCommands", (string)null);
+                    b.ToTable("CustomTextCommands");
                 });
 
             modelBuilder.Entity("TASagentTwitchBot.Core.Database.User", b =>
@@ -69,8 +69,9 @@ namespace TASagentTwitchBot.WebTTSOnly.Migrations
                     b.Property<int>("TTSSpeedPreference")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("TTSVoicePreference")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("TTSVoicePreference")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TwitchUserId")
                         .IsRequired()
@@ -82,7 +83,7 @@ namespace TASagentTwitchBot.WebTTSOnly.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

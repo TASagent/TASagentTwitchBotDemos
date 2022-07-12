@@ -103,8 +103,12 @@ builder.Services
 //Core Web TTS System
 builder.Services
     .AddTASSingleton(TASagentTwitchBot.Core.TTS.TTSConfiguration.GetConfig())
-    .AddTASSingleton<TASagentTwitchBot.Core.TTS.TTSWebRenderer>()
-    .AddTASSingleton<TASagentTwitchBot.Core.TTS.TTSSystem>();
+    .AddTASSingleton<TASagentTwitchBot.Core.TTS.TTSRenderer>()
+    .AddTASSingleton<TASagentTwitchBot.Core.TTS.TTSSystem>()
+    .AddTASSingleton<TASagentTwitchBot.Core.TTS.TTSWebRequestHandler>()
+    .AddTASSingleton<TASagentTwitchBot.Plugin.TTS.AmazonTTS.AmazonTTSWebSystem>()
+    .AddTASSingleton<TASagentTwitchBot.Plugin.TTS.AzureTTS.AzureTTSWebSystem>()
+    .AddTASSingleton<TASagentTwitchBot.Plugin.TTS.GoogleTTS.GoogleTTSWebSystem>();
 
 //EventSub System
 //Core EventSub
@@ -158,6 +162,9 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseAuthorization();
 app.UseDefaultFiles();
+
+//Config Directory Web Assets - overriding all content
+app.UseDocumentsOverrideContent();
 
 //Custom Web Assets
 app.UseStaticFiles();

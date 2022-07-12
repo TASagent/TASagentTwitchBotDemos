@@ -2,17 +2,19 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TASagentTwitchBot.NoTTSDemo.Database;
+using TASagentTwitchBot.SimpleDemo.Database;
 
 #nullable disable
 
-namespace TASagentTwitchBot.NoTTSDemo.Migrations
+namespace TASagentTwitchBot.SimpleDemo.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220712162450_TranslatingTTSVoice")]
+    partial class TranslatingTTSVoice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.6");
@@ -73,6 +75,9 @@ namespace TASagentTwitchBot.NoTTSDemo.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("OldTTSVoicePreference")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("TwitchUserId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -119,6 +124,28 @@ namespace TASagentTwitchBot.NoTTSDemo.Migrations
                     b.ToTable("Quotes");
                 });
 
+            modelBuilder.Entity("TASagentTwitchBot.SimpleDemo.Database.SupplementalData", b =>
+                {
+                    b.Property<int>("SupplementalDataId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("LastPointsSpentUpdate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PointsSpent")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("SupplementalDataId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SupplementalData");
+                });
+
             modelBuilder.Entity("TASagentTwitchBot.Plugin.Quotes.Quote", b =>
                 {
                     b.HasOne("TASagentTwitchBot.Core.Database.User", "Creator")
@@ -128,6 +155,17 @@ namespace TASagentTwitchBot.NoTTSDemo.Migrations
                         .IsRequired();
 
                     b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("TASagentTwitchBot.SimpleDemo.Database.SupplementalData", b =>
+                {
+                    b.HasOne("TASagentTwitchBot.Core.Database.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

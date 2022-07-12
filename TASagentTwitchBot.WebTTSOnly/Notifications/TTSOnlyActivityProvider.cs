@@ -57,6 +57,8 @@ public class TTSOnlyActivityProvider :
 
     #region ITTSHandler
 
+    bool ITTSHandler.IsTTSVoiceValid(string voice) => ttsRenderer.IsTTSVoiceValid(voice);
+    Core.TTS.TTSVoiceInfo? ITTSHandler.GetTTSVoiceInfo(string voice) => ttsRenderer.GetTTSVoiceInfo(voice);
     Task<bool> ITTSHandler.SetTTSEnabled(bool enabled) => ttsRenderer.SetTTSEnabled(enabled);
 
     public virtual async void HandleTTS(

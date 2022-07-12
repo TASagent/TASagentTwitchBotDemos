@@ -89,7 +89,6 @@ public class WebTTSOnlyConfigurator : Core.StandardConfigurator
             {
                 botConfig.CommandConfiguration.GlobalErrorHandlingEnabled = false;
                 botConfig.CommandConfiguration.HelpEnabled = false;
-                botConfig.CommandConfiguration.ScopedEnabled = true;
 
                 botConfig.MicConfiguration.Enabled = false;
                 botConfig.VoiceOutputDevice = devices[0];

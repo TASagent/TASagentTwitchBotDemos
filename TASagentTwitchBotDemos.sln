@@ -35,7 +35,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Plugin.Au
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Plugin.Quotes", "TASagentTwitchBotCore\TASagentTwitchBot.Plugin.Quotes\TASagentTwitchBot.Plugin.Quotes.csproj", "{48BD8EB4-3B35-4B29-86CF-CD759CFC2EA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TASagentTwitchBot.ScriptTest", "TASagentTwitchBot.ScriptTest\TASagentTwitchBot.ScriptTest.csproj", "{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.ScriptTest", "TASagentTwitchBot.ScriptTest\TASagentTwitchBot.ScriptTest.csproj", "{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Plugin.TTS.AmazonTTS", "TASagentTwitchBotCore\TASagentTwitchBot.Plugin.TTS.AmazonTTS\TASagentTwitchBot.Plugin.TTS.AmazonTTS.csproj", "{DD42E09A-5085-4137-BD0E-96126920FAB8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Plugin.TTS.AzureTTS", "TASagentTwitchBotCore\TASagentTwitchBot.Plugin.TTS.AzureTTS\TASagentTwitchBot.Plugin.TTS.AzureTTS.csproj", "{75641912-67D9-4588-A985-1140134EAFCA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TASagentTwitchBot.Plugin.TTS.GoogleTTS", "TASagentTwitchBotCore\TASagentTwitchBot.Plugin.TTS.GoogleTTS\TASagentTwitchBot.Plugin.TTS.GoogleTTS.csproj", "{9F2BFDAE-5A63-4985-BA33-711B6F80DF10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,6 +113,18 @@ Global
 		{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0545E5F5-7C97-4351-ABBB-D4DDDE7587F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD42E09A-5085-4137-BD0E-96126920FAB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD42E09A-5085-4137-BD0E-96126920FAB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD42E09A-5085-4137-BD0E-96126920FAB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD42E09A-5085-4137-BD0E-96126920FAB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75641912-67D9-4588-A985-1140134EAFCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75641912-67D9-4588-A985-1140134EAFCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75641912-67D9-4588-A985-1140134EAFCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75641912-67D9-4588-A985-1140134EAFCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F2BFDAE-5A63-4985-BA33-711B6F80DF10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F2BFDAE-5A63-4985-BA33-711B6F80DF10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F2BFDAE-5A63-4985-BA33-711B6F80DF10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F2BFDAE-5A63-4985-BA33-711B6F80DF10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +137,9 @@ Global
 		{AF1AC4E3-0451-4221-9771-E67701E89648} = {4993C050-2F34-408B-91CB-A7025BC7250B}
 		{45F7BD40-C309-4893-B690-B08726C27E66} = {4993C050-2F34-408B-91CB-A7025BC7250B}
 		{48BD8EB4-3B35-4B29-86CF-CD759CFC2EA4} = {4993C050-2F34-408B-91CB-A7025BC7250B}
+		{DD42E09A-5085-4137-BD0E-96126920FAB8} = {4993C050-2F34-408B-91CB-A7025BC7250B}
+		{75641912-67D9-4588-A985-1140134EAFCA} = {4993C050-2F34-408B-91CB-A7025BC7250B}
+		{9F2BFDAE-5A63-4985-BA33-711B6F80DF10} = {4993C050-2F34-408B-91CB-A7025BC7250B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F4365226-7A4E-4F79-9340-4B28620BC229}

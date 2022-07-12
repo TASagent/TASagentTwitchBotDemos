@@ -12,7 +12,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.7">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -22,6 +22,9 @@
 		<ProjectReference Include="..\TASagentTwitchBotCore\BGC_Tools\BGC_Tools.csproj" />
 		<ProjectReference Include="..\TASagentTwitchBotCore\TASagentTwitchBot.Core\TASagentTwitchBot.Core.csproj" />
 		<ProjectReference Include="..\TASagentTwitchBotCore\TASagentTwitchBot.Plugin.Quotes\TASagentTwitchBot.Plugin.Quotes.csproj" />
+		<ProjectReference Include="..\TASagentTwitchBotCore\TASagentTwitchBot.Plugin.TTS.AmazonTTS\TASagentTwitchBot.Plugin.TTS.AmazonTTS.csproj" />
+		<ProjectReference Include="..\TASagentTwitchBotCore\TASagentTwitchBot.Plugin.TTS.AzureTTS\TASagentTwitchBot.Plugin.TTS.AzureTTS.csproj" />
+		<ProjectReference Include="..\TASagentTwitchBotCore\TASagentTwitchBot.Plugin.TTS.GoogleTTS\TASagentTwitchBot.Plugin.TTS.GoogleTTS.csproj" />
 	</ItemGroup>
 
 </Project>
