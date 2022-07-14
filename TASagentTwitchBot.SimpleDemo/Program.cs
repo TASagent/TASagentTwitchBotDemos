@@ -180,6 +180,7 @@ builder.Services
 
 //Custom Point-spender System
 builder.Services
+    .AddTASSingleton(TASagentTwitchBot.SimpleDemo.PointsSpender.PointSpenderConfiguration.GetConfig())
     .AddTASSingleton<TASagentTwitchBot.SimpleDemo.PointsSpender.PointSpenderHandler>()
     .AddTASSingleton<TASagentTwitchBot.SimpleDemo.PointsSpender.PointsSpenderSystem>();
 

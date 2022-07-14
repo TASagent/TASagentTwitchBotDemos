@@ -43,6 +43,7 @@ public class Program
         RunTest(TestEnums);
         RunTest(TestValues);
         RunTest(TestFunctionInvocations);
+        RunTest(TestReturn);
 
         Console.ReadKey();
     }
@@ -1816,6 +1817,27 @@ public class Program
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
         return newScript.ExecuteFunction<List<bool>>("TestFunctionInvocations", 2_000, scriptContext, Array.Empty<object>());
+    }
+
+    static List<bool> TestReturn()
+    {
+        GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
+
+        const string TestValuesScript = @"
+            void TestReturn()
+            {
+                return;
+            }";
+
+        Script newScript = ScriptParser.LexAndParseScript(
+            script: TestValuesScript,
+            new FunctionSignature("TestReturn", typeof(void), Array.Empty<VariableData>()));
+
+        ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
+
+        newScript.ExecuteFunction("TestReturn", scriptContext, Array.Empty<object>());
+
+        return new List<bool>() { true };
     }
 
     #region TestClasses

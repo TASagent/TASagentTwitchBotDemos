@@ -15,7 +15,7 @@ namespace TASagentTwitchBot.WebTTSOnly.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.6");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.7");
 
             modelBuilder.Entity("TASagentTwitchBot.Core.Database.CustomTextCommand", b =>
                 {
@@ -28,6 +28,9 @@ namespace TASagentTwitchBot.WebTTSOnly.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Enabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Shown")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Text")

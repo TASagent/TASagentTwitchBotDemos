@@ -85,6 +85,9 @@ builder.Services
     .AddTASSingleton<TASagentTwitchBot.Core.Commands.SystemCommandSystem>()
     .AddTASSingleton<TASagentTwitchBot.Core.Commands.PermissionSystem>();
 
+builder.Services
+    .AddTASSingleton<TASagentTwitchBot.EmoteEffectsDemo.ActivityDispatcherStub>();
+
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {

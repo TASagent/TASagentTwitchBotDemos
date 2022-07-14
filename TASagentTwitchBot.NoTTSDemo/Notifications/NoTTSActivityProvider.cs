@@ -21,6 +21,7 @@ public class NoTTSActivityProvider :
     protected readonly ISoundEffectSystem soundEffectSystem;
     protected readonly IAudioPlayer audioPlayer;
     protected readonly IAudioEffectSystem audioEffectSystem;
+    protected readonly INotificationImageHelper notificationImageHelper;
     protected readonly NotificationServer notificationServer;
     protected readonly Core.Bits.CheerHelper cheerHelper;
 
@@ -38,6 +39,7 @@ public class NoTTSActivityProvider :
         IAudioPlayer audioPlayer,
         IAudioEffectSystem audioEffectSystem,
         Core.Bits.CheerHelper cheerHelper,
+        INotificationImageHelper notificationImageHelper,
         IActivityDispatcher activityDispatcher,
         NotificationServer notificationServer,
         Core.Database.IUserHelper userHelper)
@@ -48,6 +50,7 @@ public class NoTTSActivityProvider :
         this.audioEffectSystem = audioEffectSystem;
         this.audioPlayer = audioPlayer;
         this.cheerHelper = cheerHelper;
+        this.notificationImageHelper = notificationImageHelper;
 
         this.activityDispatcher = activityDispatcher;
         this.notificationServer = notificationServer;
@@ -128,7 +131,7 @@ public class NoTTSActivityProvider :
         int tier)
     {
         return Task.FromResult<Core.Notifications.NotificationMessage>(new ImageNotificationMessage(
-            image: notificationServer.GetNextImageURL(),
+            image: notificationImageHelper.GetRandomDefaultImageURL(),
             duration: 5000,
             message: GetSubscriberNotificationMessage(subscriber, message, monthCount, tier)));
     }
@@ -330,7 +333,7 @@ public class NoTTSActivityProvider :
         int count)
     {
         return Task.FromResult<Core.Notifications.NotificationMessage>(new ImageNotificationMessage(
-            image: notificationServer.GetNextImageURL(),
+            image: notificationImageHelper.GetRandomDefaultImageURL(),
             duration: 10_000,
             message: $"WOW! {count} raiders incoming from {HttpUtility.HtmlEncode(raider.TwitchUserName)}!"));
     }
@@ -418,7 +421,7 @@ public class NoTTSActivityProvider :
         int months)
     {
         return Task.FromResult<Core.Notifications.NotificationMessage>(new ImageNotificationMessage(
-            image: notificationServer.GetNextImageURL(),
+            image: notificationImageHelper.GetRandomDefaultImageURL(),
             duration: 5_000,
             message: GetGiftSubNotificationMessage(sender, recipient, tier, months)));
     }
@@ -529,7 +532,7 @@ public class NoTTSActivityProvider :
         int months)
     {
         return Task.FromResult<Core.Notifications.NotificationMessage>(new ImageNotificationMessage(
-            image: notificationServer.GetNextImageURL(),
+            image: notificationImageHelper.GetRandomDefaultImageURL(),
             duration: 5_000,
             message: GetAnonGiftSubNotificationMessage(recipient, tier, months)));
     }
@@ -634,7 +637,7 @@ public class NoTTSActivityProvider :
     protected virtual Task<Core.Notifications.NotificationMessage> GetFollowNotificationRequest(Core.Database.User follower)
     {
         return Task.FromResult<Core.Notifications.NotificationMessage>(new ImageNotificationMessage(
-            image: notificationServer.GetNextImageURL(),
+            image: notificationImageHelper.GetRandomDefaultImageURL(),
             duration: 4_000,
             message: GetFollowNotificationMessage(follower)));
     }
