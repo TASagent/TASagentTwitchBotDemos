@@ -44,6 +44,7 @@ public class Program
         RunTest(TestValues);
         RunTest(TestFunctionInvocations);
         RunTest(TestReturn);
+        RunTest(TestParameterArgumentModifiers);
 
         Console.ReadKey();
     }
@@ -181,7 +182,7 @@ public class Program
             new FunctionSignature(
                 identifier: "SetupFunction",
                 returnType: typeof(void),
-                arguments: new VariableData("argument", typeof(int))),
+                arguments: new ArgumentData("argument", typeof(int))),
             new FunctionSignature(
                 identifier: "RunTests",
                 returnType: typeof(List<bool>)));
@@ -1113,7 +1114,7 @@ public class Program
             new FunctionSignature(
                 identifier: "FibonacciNumber",
                 returnType: typeof(int),
-                arguments: new VariableData("index", typeof(int))));
+                arguments: new ArgumentData("index", typeof(int))));
 
         ScriptRuntimeContext context = script.PrepareScript(globalContext);
         return script.ExecuteFunction<List<bool>>("RunTests", context);
@@ -1181,7 +1182,7 @@ public class Program
             new FunctionSignature(
                 identifier: "FibonacciNumber",
                 returnType: typeof(int),
-                arguments: new VariableData("index", typeof(int))));
+                arguments: new ArgumentData("index", typeof(int))));
 
         ScriptRuntimeContext context = script.PrepareScript(globalContext);
         List<bool> tests = script.ExecuteFunction<List<bool>>("RunTests", context);
@@ -1526,7 +1527,7 @@ public class Program
 
         Script newScript = ScriptParser.LexAndParseScript(
             script: TestScriptA,
-            new FunctionSignature("TestStringInterpolation", typeof(List<bool>), Array.Empty<VariableData>()));
+            new FunctionSignature("TestStringInterpolation", typeof(List<bool>)));
 
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
@@ -1563,7 +1564,7 @@ public class Program
 
         Script newScript = ScriptParser.LexAndParseScript(
             script: TestGenericsScript,
-            new FunctionSignature("TestGenerics", typeof(List<bool>), Array.Empty<VariableData>()));
+            new FunctionSignature("TestGenerics", typeof(List<bool>)));
 
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
@@ -1592,7 +1593,7 @@ public class Program
 
         Script newScript = ScriptParser.LexAndParseScript(
             script: TestBindingScript,
-            new FunctionSignature("TestBinding", typeof(List<bool>), Array.Empty<VariableData>()));
+            new FunctionSignature("TestBinding", typeof(List<bool>)));
 
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
@@ -1654,7 +1655,7 @@ public class Program
 
         Script newScript = ScriptParser.LexAndParseScript(
             script: TestStaticBindingScript,
-            new FunctionSignature("TestStaticBinding", typeof(List<bool>), Array.Empty<VariableData>()));
+            new FunctionSignature("TestStaticBinding", typeof(List<bool>)));
 
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
@@ -1704,7 +1705,7 @@ public class Program
 
         Script newScript = ScriptParser.LexAndParseScript(
             script: TestCastingScript,
-            new FunctionSignature("TestCasting", typeof(List<bool>), Array.Empty<VariableData>()));
+            new FunctionSignature("TestCasting", typeof(List<bool>)));
 
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
@@ -1737,7 +1738,7 @@ public class Program
 
         Script newScript = ScriptParser.LexAndParseScript(
             script: TestEnumsScript,
-            new FunctionSignature("TestEnums", typeof(List<bool>), Array.Empty<VariableData>()));
+            new FunctionSignature("TestEnums", typeof(List<bool>)));
 
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
@@ -1770,7 +1771,7 @@ public class Program
 
         Script newScript = ScriptParser.LexAndParseScript(
             script: TestValuesScript,
-            new FunctionSignature("TestValues", typeof(List<bool>), Array.Empty<VariableData>()));
+            new FunctionSignature("TestValues", typeof(List<bool>)));
 
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
@@ -1812,7 +1813,7 @@ public class Program
 
         Script newScript = ScriptParser.LexAndParseScript(
             script: TestFunctionInvocationsScript,
-            new FunctionSignature("TestFunctionInvocations", typeof(List<bool>), Array.Empty<VariableData>()));
+            new FunctionSignature("TestFunctionInvocations", typeof(List<bool>)));
 
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
@@ -1831,13 +1832,76 @@ public class Program
 
         Script newScript = ScriptParser.LexAndParseScript(
             script: TestValuesScript,
-            new FunctionSignature("TestReturn", typeof(void), Array.Empty<VariableData>()));
+            new FunctionSignature("TestReturn", typeof(void)));
 
         ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
 
         newScript.ExecuteFunction("TestReturn", scriptContext, Array.Empty<object>());
 
         return new List<bool>() { true };
+    }
+
+    static List<bool> TestParameterArgumentModifiers()
+    {
+        GlobalRuntimeContext globalContext = new GlobalRuntimeContext();
+
+        ClassRegistrar.TryRegisterClass(typeof(bool));
+
+        const string TestArgumentsScript = @"
+            List<bool> TestArgs()
+            {
+                List<bool> tests = new List<bool>();
+
+                int testValue = 5;
+
+                TestStandardArg(testValue);
+                tests.Add(testValue == 5);
+
+                TestRefArg(ref testValue);
+                tests.Add(testValue == 6);
+
+                TestOutArg(out testValue);
+                tests.Add(testValue == 4);
+
+                bool tempOut;
+                tests.Add(bool.TryParse(""true"", out tempOut));
+                tests.Add(tempOut);
+                tests.Add(bool.TryParse(""FALSE"", out tempOut));
+                tests.Add(!tempOut);
+
+                tests.Add(!bool.TryParse(""asdf"", out tempOut));
+
+                int testInt;
+                tests.Add(int.TryParse(""5"", out testInt));
+                tests.Add(testInt == 5);
+
+                return tests;
+            }
+
+
+            void TestStandardArg(int value)
+            {
+                value++;
+            }
+
+            void TestRefArg(ref int value)
+            {
+                value++;
+            }
+
+            void TestOutArg(out int value)
+            {
+                value = 4;
+            }";
+
+        Script newScript = ScriptParser.LexAndParseScript(
+            script: TestArgumentsScript,
+            new FunctionSignature("TestArgs", typeof(List<bool>)));
+
+        ScriptRuntimeContext scriptContext = newScript.PrepareScript(globalContext);
+
+        return newScript.ExecuteFunction<List<bool>>("TestArgs", 2_000, scriptContext, Array.Empty<object>());
+
     }
 
     #region TestClasses
