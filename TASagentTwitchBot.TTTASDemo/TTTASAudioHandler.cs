@@ -1,4 +1,5 @@
 ﻿using TASagentTwitchBot.Core;
+using TASagentTwitchBot.Core.Donations;
 using TASagentTwitchBot.Core.Notifications;
 
 namespace TASagentTwitchBot.TTTASDemo;
@@ -19,6 +20,8 @@ public class TTTASAudioHandler :
         this.audioPlayer = audioPlayer;
     }
 
+    #region IActivityHandler
+
     public async Task Execute(ActivityRequest activityRequest)
     {
         if (activityRequest is IAudioActivity audioActivity && audioActivity.AudioRequest is not null)
@@ -26,6 +29,11 @@ public class TTTASAudioHandler :
             await audioPlayer.PlayAudioRequest(audioActivity.AudioRequest).WithCancellation(generalTokenSource.Token);
         }
     }
+
+    //We don't need this
+    void IActivityHandler.RegisterDonationTracker(IDonationTracker donationTracker) { }
+
+    #endregion IActivityHandler
 
     protected virtual void Dispose(bool disposing)
     {

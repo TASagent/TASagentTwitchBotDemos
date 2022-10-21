@@ -4,6 +4,7 @@ using TASagentTwitchBot.Core;
 using TASagentTwitchBot.Core.Audio;
 using TASagentTwitchBot.Core.Audio.Effects;
 using TASagentTwitchBot.Core.Notifications;
+using TASagentTwitchBot.Core.Donations;
 
 namespace TASagentTwitchBot.NoTTSDemo.Notifications;
 
@@ -28,6 +29,8 @@ public class NoTTSActivityProvider :
     protected readonly Core.Database.IUserHelper userHelper;
 
     protected readonly CancellationTokenSource generalTokenSource = new CancellationTokenSource();
+
+    private IDonationTracker? donationTracker = null;
 
     protected readonly HashSet<string> followedUserIds = new HashSet<string>();
 
@@ -58,6 +61,8 @@ public class NoTTSActivityProvider :
         this.userHelper = userHelper;
     }
 
+    #region IActivityHandler
+
     public Task Execute(ActivityRequest activityRequest)
     {
         List<Task> taskList = new List<Task>();
@@ -75,6 +80,17 @@ public class NoTTSActivityProvider :
         return Task.WhenAll(taskList).WithCancellation(generalTokenSource.Token);
     }
 
+    public void RegisterDonationTracker(IDonationTracker donationTracker)
+    {
+        if (this.donationTracker is not null)
+        {
+            throw new Exception($"donationTracker already assigned: Was \"{this.donationTracker}\", Assigned \"{donationTracker}\"");
+        }
+
+        this.donationTracker = donationTracker;
+    }
+
+    #endregion IActivityHandler
     #region ISubscriptionHandler
 
     public virtual async void HandleSubscription(
@@ -84,6 +100,8 @@ public class NoTTSActivityProvider :
         int tier,
         bool approved)
     {
+        donationTracker?.AddSubs(1, tier);
+
         Core.Database.User? subscriber = await userHelper.GetUserByTwitchId(userId);
 
         if (subscriber is null)
@@ -209,8 +227,11 @@ public class NoTTSActivityProvider :
         Core.Database.User cheerer,
         string message,
         int quantity,
+        bool meetsTTSThreshold,
         bool approved)
     {
+        donationTracker?.AddBits(quantity);
+
         communication.NotifyEvent($"Cheer {quantity}: {cheerer.TwitchUserName}");
 
         string? chatResponse = await GetCheerChatResponse(cheerer, message, quantity);
@@ -372,6 +393,8 @@ public class NoTTSActivityProvider :
         int months,
         bool approved)
     {
+        donationTracker?.AddSubs(1, tier);
+
         Core.Database.User? sender = await userHelper.GetUserByTwitchId(senderId);
         Core.Database.User? recipient = await userHelper.GetUserByTwitchId(recipientId);
 
@@ -492,6 +515,8 @@ public class NoTTSActivityProvider :
         int months,
         bool approved)
     {
+        donationTracker?.AddSubs(1, tier);
+
         Core.Database.User? recipient = await userHelper.GetUserByTwitchId(recipientId);
 
         if (recipient is null)

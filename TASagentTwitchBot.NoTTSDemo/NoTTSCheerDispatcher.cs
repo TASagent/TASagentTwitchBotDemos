@@ -17,7 +17,7 @@ public class NoTTSCheerDispatcher
     {
         if (chatter.Bits != 0)
         {
-            cheerHandler.HandleCheer(chatter.User, chatter.Message, chatter.Bits, true);
+            cheerHandler.HandleCheer(chatter.User, chatter.Message, chatter.Bits, false, true);
         }
     }
 }

@@ -37,6 +37,8 @@ public class TTSOnlyActivityProvider :
         this.ttsMarqueeHubContext = ttsMarqueeHubContext;
     }
 
+    #region IActivityHandler
+
     public Task Execute(ActivityRequest activityRequest)
     {
         List<Task> taskList = new List<Task>();
@@ -55,6 +57,10 @@ public class TTSOnlyActivityProvider :
         return Task.WhenAll(taskList).WithCancellation(generalTokenSource.Token);
     }
 
+    public void RegisterDonationTracker(Core.Donations.IDonationTracker donationTracker) { }
+
+
+    #endregion IActivityHandler
     #region ITTSHandler
 
     bool ITTSHandler.IsTTSVoiceValid(string voice) => ttsRenderer.IsTTSVoiceValid(voice);

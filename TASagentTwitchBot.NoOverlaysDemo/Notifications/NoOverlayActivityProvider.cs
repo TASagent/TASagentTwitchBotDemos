@@ -3,6 +3,7 @@
 using TASagentTwitchBot.Core;
 using TASagentTwitchBot.Core.Audio;
 using TASagentTwitchBot.Core.Audio.Effects;
+using TASagentTwitchBot.Core.Donations;
 using TASagentTwitchBot.Core.Notifications;
 using TASagentTwitchBot.Core.TTS;
 
@@ -26,6 +27,8 @@ public class NoOverlayActivityProvider :
     protected readonly ITTSRenderer ttsRenderer;
 
     protected readonly Core.Database.IUserHelper userHelper;
+
+    protected IDonationTracker? donationTracker = null;
 
     protected readonly CancellationTokenSource generalTokenSource = new CancellationTokenSource();
 
@@ -54,6 +57,8 @@ public class NoOverlayActivityProvider :
         this.userHelper = userHelper;
     }
 
+    #region IActivityHandler
+
     public Task Execute(ActivityRequest activityRequest)
     {
         List<Task> taskList = new List<Task>();
@@ -66,6 +71,17 @@ public class NoOverlayActivityProvider :
         return Task.WhenAll(taskList).WithCancellation(generalTokenSource.Token);
     }
 
+    public void RegisterDonationTracker(IDonationTracker donationTracker)
+    {
+        if (this.donationTracker is not null)
+        {
+            throw new Exception($"donationTracker already assigned: Was \"{this.donationTracker}\", Assigned \"{donationTracker}\"");
+        }
+
+        this.donationTracker = donationTracker;
+    }
+
+    #endregion IActivityHandler
     #region ISubscriptionHandler
 
     public virtual async void HandleSubscription(
@@ -75,6 +91,8 @@ public class NoOverlayActivityProvider :
         int tier,
         bool approved)
     {
+        donationTracker?.AddSubs(1, tier);
+
         Core.Database.User? subscriber = await userHelper.GetUserByTwitchId(userId);
 
         if (subscriber is null)
@@ -199,8 +217,11 @@ public class NoOverlayActivityProvider :
         Core.Database.User cheerer,
         string message,
         int quantity,
+        bool meetsTTSThreshold,
         bool approved)
     {
+        donationTracker?.AddBits(quantity);
+
         communication.NotifyEvent($"Cheer {quantity}: {cheerer.TwitchUserName}");
 
         string? chatResponse = await GetCheerChatResponse(cheerer, message, quantity);
@@ -214,7 +235,7 @@ public class NoOverlayActivityProvider :
                 activityHandler: this,
                 description: $"User {cheerer.TwitchUserName} cheered {quantity} bits: {message}",
                 requesterId: cheerer.TwitchUserId,
-                audioRequest: await GetCheerAudioRequest(cheerer, message, quantity)),
+                audioRequest: await GetCheerAudioRequest(cheerer, message, quantity, meetsTTSThreshold)),
             approved: approved);
     }
 
@@ -229,7 +250,8 @@ public class NoOverlayActivityProvider :
     protected virtual async Task<AudioRequest?> GetCheerAudioRequest(
         Core.Database.User cheerer,
         string message,
-        int quantity)
+        int quantity,
+        bool meetsTTSThreshold)
     {
         AudioRequest? soundEffectRequest = null;
         AudioRequest? ttsRequest = null;
@@ -249,7 +271,7 @@ public class NoOverlayActivityProvider :
             }
         }
 
-        if (!string.IsNullOrWhiteSpace(message))
+        if (meetsTTSThreshold && !string.IsNullOrWhiteSpace(message))
         {
             ttsRequest = await ttsRenderer.TTSRequest(
                 authorizationLevel: cheerer.AuthorizationLevel,
@@ -337,6 +359,8 @@ public class NoOverlayActivityProvider :
         int months,
         bool approved)
     {
+        donationTracker?.AddSubs(1, tier);
+
         Core.Database.User? sender = await userHelper.GetUserByTwitchId(senderId);
         Core.Database.User? recipient = await userHelper.GetUserByTwitchId(recipientId);
 
@@ -410,6 +434,8 @@ public class NoOverlayActivityProvider :
         int months,
         bool approved)
     {
+        donationTracker?.AddSubs(1, tier);
+
         Core.Database.User? recipient = await userHelper.GetUserByTwitchId(recipientId);
 
         if (recipient is null)
