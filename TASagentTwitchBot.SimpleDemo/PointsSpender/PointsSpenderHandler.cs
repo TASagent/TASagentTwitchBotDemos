@@ -4,7 +4,7 @@ using BGC.Utility;
 
 using TASagentTwitchBot.Core.Database;
 using TASagentTwitchBot.Core.API.Twitch;
-using TASagentTwitchBot.Core.PubSub;
+using TASagentTwitchBot.Core.Redemptions;
 using TASagentTwitchBot.SimpleDemo.Database;
 
 namespace TASagentTwitchBot.SimpleDemo.PointsSpender;
@@ -159,7 +159,7 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
         initSemaphore.Release();
     }
 
-    public async Task HandleRedemption(User user, ChannelPointMessageData.Datum.RedemptionData redemption)
+    public async Task HandleRedemption(User user, RedemptionData redemption)
     {
         //Handle redemption
         communication.SendDebugMessage($"PointSpender Redemption: {user.TwitchUserName}");
@@ -169,14 +169,14 @@ public class PointSpenderHandler : IPointSpenderHandler, IRedemptionContainer, I
 
         SupplementalData supplementalData = await db.GetSupplementalDataAsync(user);
 
-        supplementalData.PointsSpent += redemption.Reward.Cost;
+        supplementalData.PointsSpent += redemption.RewardData.Cost;
         supplementalData.LastPointsSpentUpdate = redemption.RedeemedAt;
 
         await db.SaveChangesAsync();
 
         await helixHelper.UpdateCustomRewardRedemptions(
-            redemption.Reward.Id,
-            redemption.Id,
+            redemption.RewardData.Id,
+            redemption.RedemptionId,
             status: "FULFILLED");
 
         if (!string.IsNullOrEmpty(pointSpenderConfig.RedemptionMessage))

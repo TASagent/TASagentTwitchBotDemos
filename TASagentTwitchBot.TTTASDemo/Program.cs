@@ -94,10 +94,13 @@ builder.Services
     .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.PitchShiftEffectProvider>()
     .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.ReverbEffectProvider>();
 
-//Core PubSub System
+//EventSub System
 builder.Services
-    .AddTASSingleton<TASagentTwitchBot.Core.PubSub.PubSubClient>()
-    .AddTASSingleton<TASagentTwitchBot.Core.PubSub.RedemptionSystem>();
+    .AddTASSingleton<TASagentTwitchBot.Core.EventSub.EventSubWebSocketHandler>();
+
+//Core Redemption System
+builder.Services
+    .AddTASSingleton<TASagentTwitchBot.Core.Redemptions.RedemptionSystem>();
 
 //Core Timer System
 builder.Services.AddTASSingleton<TASagentTwitchBot.Core.Timer.TimerManager>();
@@ -230,7 +233,6 @@ catch (Exception ex)
 //
 
 await app.StopAsync();
-
 
 TASagentTwitchBot.Core.Config.BotConfiguration GetDefaultBotConfig() =>
     new TASagentTwitchBot.Core.Config.BotConfiguration()

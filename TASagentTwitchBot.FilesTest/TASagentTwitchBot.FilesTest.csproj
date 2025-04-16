@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<UserSecretsId>fff0af7b-fa69-4c1e-93ad-7c36644d070a</UserSecretsId>
@@ -11,6 +11,10 @@
 		<Product>TASagentTwitchBotFilesTest</Product>
 		<AssemblyVersion>2.0.0.0</AssemblyVersion>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="RestSharp" Version="112.1.0" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\TASagentTwitchBotCore\BGC_Tools\BGC_Tools.csproj" />

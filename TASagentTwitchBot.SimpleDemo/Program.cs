@@ -112,10 +112,9 @@ builder.Services
     .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.PitchShiftEffectProvider>()
     .AddTASSingleton<TASagentTwitchBot.Core.Audio.Effects.ReverbEffectProvider>();
 
-//Core PubSub System
+//Core Redemption System
 builder.Services
-    .AddTASSingleton<TASagentTwitchBot.Core.PubSub.PubSubClient>()
-    .AddTASSingleton<TASagentTwitchBot.Core.PubSub.RedemptionSystem>();
+    .AddTASSingleton<TASagentTwitchBot.Core.Redemptions.RedemptionSystem>();
 
 //Core Emote Effects System
 builder.Services

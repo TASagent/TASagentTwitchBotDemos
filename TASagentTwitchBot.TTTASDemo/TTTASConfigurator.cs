@@ -28,7 +28,7 @@ public class TTTASConfigurator : Core.StandardConfigurator
         successful |= ConfigureTwitchClient();
 
         //Check Accounts
-        successful |= await ConfigureBotAccount(botTokenValidator);
+        successful |= await ConfigureBotAccount(botTokenValidator, helixHelper);
         successful |= await ConfigureBroadcasterAccount(broadcasterTokenValidator, helixHelper);
 
         successful |= ConfigurePasswords();
